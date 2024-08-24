@@ -30,7 +30,7 @@ export default function Home() {
       ></Image>
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-7 right-7 z-20">
         <Button
           variant="outline"
           size="icon"

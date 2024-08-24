@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useRef, useEffect, Suspense } from 'react';
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
+import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
+import { OrbitControls, useGLTF, useAnimations, useCubeTexture  } from '@react-three/drei';
 import * as THREE from 'three';
 
 
@@ -11,15 +11,41 @@ const CameraLogger = () => {
   const { camera } = useThree();
 
   useFrame(() => {
-    console.log('Camera Rotation (radians):', camera.rotation);
-    console.log('Camera Rotation (degrees):', {
-      x: THREE.MathUtils.radToDeg(camera.rotation.x),
-      y: THREE.MathUtils.radToDeg(camera.rotation.y),
-      z: THREE.MathUtils.radToDeg(camera.rotation.z),
+    console.log('Camera Position:', {
+      x: camera.position.x,
+      y: camera.position.y,
+      z: camera.position.z,
+    });
+    console.log('Camera Position (degrees):', {
+      x: THREE.MathUtils.radToDeg(camera.position.x),
+      y: THREE.MathUtils.radToDeg(camera.position.y),
+      z: THREE.MathUtils.radToDeg(camera.position.z),
     });
   });
-
   return null;
+};
+
+const Cat = ({ position }: { position: [number, number, number] }) => {
+  const { scene, animations } = useGLTF('/3d/cat/scene.gltf') as any;
+  const ref = useRef<THREE.Group>(null!);
+  const { actions } = useAnimations(animations, ref);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.position.set(position[0], position[1], position[2]);
+      ref.current.scale.set(0.007, 0.007, 0.007); // Scale down the model
+
+      // Play the animation (assuming the first animation is the one you want to play)
+      if (actions && Object.keys(actions).length > 0) {
+        const firstAction = actions[Object.keys(actions)[0]];
+        if (firstAction) {
+          firstAction.play();
+        }
+      }
+    }
+  }, [position, actions]);
+
+  return <primitive ref={ref} object={scene} />;
 };
 
 export function ModelViewer() {
@@ -31,12 +57,11 @@ export function ModelViewer() {
   const cameraPosition = new THREE.Vector3(
     -0.9086362791170548,
     0.6565,
-    -0.2
+    -0.4
   );
 
-  const targetPosition = new THREE.Vector3(-0.9750185175385239, 0.6479162114519987, -0.41090802154821415);
+  const targetPosition = new THREE.Vector3(-1, 0.6479162114519987, -0.41090802154821415);
 
-  
   return (
     <Canvas
       camera={{
@@ -54,11 +79,16 @@ export function ModelViewer() {
       <hemisphereLight  groundColor="#444444" intensity={1} /> {/* Added hemisphere light */}
       <Suspense fallback={null}>
         <primitive object={scene} scale={0.5} />
+        <Cat position={[ -1.25,
+    0.3865,
+    -0.45]}
+     /> 
       </Suspense>
       <OrbitControls target={targetPosition} 
       maxPolarAngle={2} // Restrict downward rotation
       minPolarAngle={1.2}
-      enablePan={false}/>
+      enablePan={false}
+      enableZoom={false}/>
       <CameraLogger />
     </Canvas>
   );
