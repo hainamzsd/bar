@@ -4,6 +4,8 @@ import React, { useRef, useEffect, Suspense } from 'react';
 import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useAnimations, useCubeTexture  } from '@react-three/drei';
 import * as THREE from 'three';
+import AnimatedText from './3DText';
+import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
 
   
@@ -48,7 +50,11 @@ const Cat = ({ position }: { position: [number, number, number] }) => {
   return <primitive ref={ref} object={scene} />;
 };
 
-export function ModelViewer() {
+interface Props {
+  setShowChat: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function ModelViewer({ setShowChat }: Props) {
   const modelPath = '/3d/scene.gltf';
   const { scene } = useGLTF(modelPath) as unknown as { scene: THREE.Scene };
   const cameraRef = useRef<THREE.PerspectiveCamera>(null!);
@@ -89,7 +95,15 @@ export function ModelViewer() {
       minPolarAngle={1.2}
       enablePan={false}
       enableZoom={false}/>
-      <CameraLogger />
+      <CameraLogger />    
+        <group layers={1}>
+        <Suspense fallback={null}>
+          <AnimatedText setShowChat={setShowChat}/>
+        </Suspense>
+      </group>
+      <EffectComposer>
+            <Bloom intensity={0.5} luminanceThreshold={0.3} luminanceSmoothing={0.9} />
+          </EffectComposer>
     </Canvas>
   );
 }

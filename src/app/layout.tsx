@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import AuthProvider from "@/context/AuthContext";
+import QueryProvider from "@/lib/react-query/queryProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,16 +20,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-        <body>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </body>
+      <body>
+        <QueryProvider>
+          <AuthProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+            <Toaster></Toaster>
+          </AuthProvider>
+        </QueryProvider>
+      </body>
     </html>
   );
 }
