@@ -4,7 +4,7 @@ import {
     useQueryClient,
     useInfiniteQuery
 } from '@tanstack/react-query'
-import { createUserAccount, signInAccount } from '../appwrite/api'
+import { createUserAccount, signInAccount, signInFacebook } from '../appwrite/api'
 import { INewUser } from '@/types'
 
 export const useCreateUserAccount = () => {
@@ -19,3 +19,9 @@ export const useSignInAccount = () => {
             password:string}) => signInAccount(user)
     })
 }
+
+export const useSignInFacebook = () => {
+    return useMutation({
+        mutationFn: () => signInFacebook(),
+    });
+};

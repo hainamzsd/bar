@@ -57,12 +57,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         const cookieFallback = localStorage.getItem('cookieFallBack');
-        if (cookieFallback === '[]' || cookieFallback) {
+        if (cookieFallback === '[]') {
             router.push('/');
         } else {
             checkAuthUser();
         }
-    }, []); // Empty dependency array to run on mount
+    }, []); 
 
     const value: IContextType = {
         user,

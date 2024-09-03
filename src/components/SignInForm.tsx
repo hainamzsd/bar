@@ -1,55 +1,148 @@
 import { useRouter } from 'next/navigation';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Button } from './ui/button';
-import { Label } from './ui/label';
 import { Input } from './ui/input';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from "@hookform/resolvers/zod"
+import { SignInValidation } from '../lib/validation';
+import * as z from "zod"
+import Loader from './shared/Loader';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { title } from 'process';
+import { Toast } from './ui/toast';
+import { useSignInAccount, useSignInFacebook } from '@/lib/react-query/queriesAndMutations';
+import { useUserContext } from '@/context/AuthContext';
+import { account } from '@/lib/appwrite/config';
 
 const SignInDialog = () => {
   const router = useRouter();
+  const toast = useToast();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  const { mutateAsync: signInAccount, isPending: isSigningIn } = useSignInAccount();
+  const { mutateAsync: signInFacebook, isPending: isSigningInFacebook } = useSignInFacebook();
+
+  const form = useForm<z.infer<typeof SignInValidation>>({
+    resolver: zodResolver(SignInValidation),
+    defaultValues: {
+      email: "",
+      password: "",
+    }
+  })
+
+  async function onSubmit(values: z.infer<typeof SignInValidation>) {
+    try {
+      const session = await signInAccount({
+        email: values.email,
+        password: values.password
+      })
+      if (!session) {
+        return toast.toast({ title: "Đăng nhập không thành công, thử lại sau.", variant: "destructive" })
+      }
+
+      const isLoggedIn = await checkAuthUser();
+      if (isLoggedIn) {
+        form.reset();
+        router.push('/home')
+      } else {
+      }
+    }
+    catch (error: any) {
+      if (error.response?.status === 401) {
+        return toast.toast({
+          title: "Mật khẩu không chính xác. Vui lòng thử lại.",
+          variant: "destructive"
+        });
+      } else {
+        return toast.toast({
+          title: "Đăng nhập không thành công",
+          variant: "destructive"
+        });
+      }
+    }
+  }
+
+  const handleFacebookLogin = async () => {
+    try {
+        await signInFacebook();
+    } catch (error) {
+        toast.toast({ title: "Đăng nhập với Facebook không thành công", variant: "destructive" });
+    }
+};
 
   return (
-      <div className="sm:max-w-[425px]">
-        <div className="">
-          {/* Error Message Template */}
-          <div id="error-message" className="text-red-500 text-sm">
-            {/* Error messages will be displayed here */}
-          </div>
-          {/* Common Fields */}
-          <div className="items-center">
-            <Label htmlFor="email" className="text-right">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              className="col-span-3"
-            />
-          </div>
-
-          <div className="items-center">
-            <Label htmlFor="password" className="text-right">
-              Mật khẩu
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="********"
-              className="col-span-3"
-            />
-          </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="mt-3">
-          <Button
-            type="submit"
-            className="mb-3 w-full"
-            onClick={() => router.push('/home')}
-          >
-            Đăng nhập
-          </Button>
+    <div className="sm:max-w-[425px]">
+      {/* Error Message Template */}
+      <div id="error-message" className="text-red-500 text-sm">
+        {/* Error messages will be displayed here */}
+      </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="items-center">
+                <FormLabel htmlFor="email" className="text-right">
+                  Email
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    className="col-span-3"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="items-center">
+                <FormLabel htmlFor="password" className="text-right">
+                  Mật khẩu
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="********"
+                    className="col-span-3"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
             <Button
+              type='submit'
+              className="mb-3 w-full mt-3"
+            >
+              {isSigningIn ? (
+                <div className='flex gap-2 '>
+                  Đang tải
+                </div>
+              ) : "Đăng nhập"}
+            </Button>
+           
+        </form>
+      </Form>
+      <Button
+              onClick={handleFacebookLogin}
               variant="outline"
               className="w-full flex items-center justify-center"
             >
@@ -65,8 +158,8 @@ const SignInDialog = () => {
               </svg>
               Đăng nhập bằng Facebook
             </Button>
-        </div>
-      </div>
+    </div>
+
   );
 };
 

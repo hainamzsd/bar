@@ -37,7 +37,7 @@ const SignUpDialog = () => {
       username: "",
       email: "",
       password: "",
-      repassword: ""
+      repassword: "",
     }
   })
 

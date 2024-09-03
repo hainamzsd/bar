@@ -1,4 +1,4 @@
-import {Client, Account, Databases, Storage, Avatars, ID} from 'appwrite';
+import {Client, Account, Databases, Storage, Avatars, ID, OAuthProvider} from 'appwrite';
 
 export const appwriteConfig = {
     projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID,
@@ -10,7 +10,9 @@ export const appwriteConfig = {
     saveCollectionId: process.env.NEXT_PUBLIC_APPWRITE_SAVEPOSTS_ID
 }
 
-export const client = new Client();
+
+export const client = new Client().setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_URL as any)
+                                  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID as any);
 if (!appwriteConfig.projectId) {
   throw new Error('NEXT_APPWRITE_PROJECT_ID is not defined');
 }
@@ -22,4 +24,6 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 export const avatars = new Avatars(client);
+
+
 
