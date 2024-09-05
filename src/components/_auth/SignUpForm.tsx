@@ -1,8 +1,8 @@
 import { useRouter } from 'next/navigation';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Button } from './ui/button';
-import { Label } from './ui/label';
-import { Input } from './ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
 import {
   Form,
   FormControl,
@@ -14,14 +14,14 @@ import {
 } from "@/components/ui/form"
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SignUpValidation } from '../lib/validation';
+import { SignUpValidation } from '../../lib/validation';
 import * as z from "zod"
-import Loader from './shared/Loader';
+import Loader from '../shared/Loader';
 import { useState } from 'react';
 import { createUserAccount } from '@/lib/appwrite/api';
 import { useToast } from '@/hooks/use-toast'; 
 import { title } from 'process';
-import { Toast } from './ui/toast';
+import { Toast } from '../ui/toast';
 import { useCreateUserAccount, useSignInAccount } from '@/lib/react-query/queriesAndMutations';
 import { useUserContext } from '@/context/AuthContext';
 const SignUpDialog = () => {

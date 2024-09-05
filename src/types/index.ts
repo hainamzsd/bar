@@ -1,3 +1,5 @@
+import React from "react";
+import { LucideIcon } from "lucide-react"
 export type IContextType = {
   user: IUser;
   isLoading: boolean;
@@ -8,9 +10,9 @@ export type IContextType = {
 }
 
 export type INavLink = {
-    imgURL: string;
     route: string;
     label: string;
+    icon: LucideIcon;
   };
   
   export type IUpdateUser = {

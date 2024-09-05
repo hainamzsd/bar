@@ -13,16 +13,16 @@ const CameraLogger = () => {
   const { camera } = useThree();
 
   useFrame(() => {
-    console.log('Camera Position:', {
-      x: camera.position.x,
-      y: camera.position.y,
-      z: camera.position.z,
-    });
-    console.log('Camera Position (degrees):', {
-      x: THREE.MathUtils.radToDeg(camera.position.x),
-      y: THREE.MathUtils.radToDeg(camera.position.y),
-      z: THREE.MathUtils.radToDeg(camera.position.z),
-    });
+    // console.log('Camera Position:', {
+    //   x: camera.position.x,
+    //   y: camera.position.y,
+    //   z: camera.position.z,
+    // });
+    // console.log('Camera Position (degrees):', {
+    //   x: THREE.MathUtils.radToDeg(camera.position.x),
+    //   y: THREE.MathUtils.radToDeg(camera.position.y),
+    //   z: THREE.MathUtils.radToDeg(camera.position.z),
+    // });
   });
   return null;
 };

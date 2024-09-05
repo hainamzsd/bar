@@ -1,16 +1,23 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from './ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
+import { useSignOutAccount } from '@/lib/react-query/queriesAndMutations'
+import { useRouter } from 'next/navigation'
+import { useUserContext } from '@/context/AuthContext'
 
 export default function Profile() {
-    const [image, setImage] = useState<string | null>(null);
   const [role, setRole] = useState<string>('Customer');
-
+  const {user} = useUserContext();
+  const [image, setImage] = useState<string | null>(null);
+  useEffect(() => {
+    setImage(user.imageUrl)
+  }, [user])
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();

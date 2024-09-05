@@ -1,7 +1,6 @@
 import { INewUser } from "@/types";
-import {ID, OAuthProvider, Query} from 'appwrite'
+import {ID, Models, OAuthProvider, Query} from 'appwrite'
 import { account, appwriteConfig, avatars, databases } from "./config";
-import { headers } from "next/headers";
 
 export async function createUserAccount(user: INewUser){
     try{
@@ -59,41 +58,18 @@ export async function signInAccount(user: {
     }
 }
 export async function signInFacebook() {
-    const origin = headers().get("origin");
     try {
         // Create OAuth session
         const session = await account.createOAuth2Session(
             OAuthProvider.Facebook, // provider
-            `${origin}/home`,
-		`${origin}/`,
+            `http://localhost:3000/oauth2`,
+		`http://localhost:3000/`,
         );
-
-        // Get current user account
-        const currentAccount = await account.get();
-        if (!currentAccount) throw new Error("Failed to retrieve current account");
-
-        // Check if the user exists in the database
-        const existingUser = await databases.listDocuments(
-            appwriteConfig.databaseId as any,
-            appwriteConfig.userCollectionId as any,
-            [Query.equal('accountId', currentAccount.$id)]
-        );
-        if (existingUser.total === 0) {
-            const avatarUrl = avatars.getInitials(currentAccount.name || currentAccount.email);
-            const newUser = await saveUserToDB({
-                accountId: currentAccount.$id,
-                email: currentAccount.email,
-                username: currentAccount.name || currentAccount.email.split('@')[0],
-                imageUrl: avatarUrl,
-            });
-        }
         return session;
     } catch (error) {
         console.log("Error during Facebook sign-in:", error);
-        throw error;
     }
 }
-
 export async function getCurrentUser(){
     try{
         const currentAccount = await account.get();
@@ -108,5 +84,16 @@ export async function getCurrentUser(){
         return currentUser.documents[0];
     }catch(error){
         console.log(error)
+    }
+}
+
+export async function signOutAccount() {
+    try {
+        const session = await account.deleteSession("current");
+        console.log("Successfully logged out:", session);
+        return session;
+    } catch (error) {
+        console.error("Error during logout:", error);
+        throw error;  // Rethrow the error to handle it upstream if needed
     }
 }

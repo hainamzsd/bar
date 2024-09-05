@@ -9,8 +9,8 @@ import { useRouter } from 'next/navigation'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import SignInDialog from "@/components/SignInForm";
-import SignUpDialog from "@/components/SignUpForm";
+import SignInDialog from "@/components/_auth/SignInForm";
+import SignUpDialog from "@/components/_auth/SignUpForm";
 export default function Home() {
   const { theme, setTheme } = useTheme()
   const [isLogin, setIsLogin] = useState(true);
