@@ -10,10 +10,10 @@ const Layout = ({children}: {children: React.ReactNode}) => {
     <div className='w-full md:flex'>
         <TopBar></TopBar>
         <LeftSideBar></LeftSideBar>
-        <section className='flex flex-1 h-full'>
+        <section  className='flex-1 md:ml-[270px] mt-[64px] p-4 bg-primary-foreground h-screen'>
             {children}
         </section>
-        <BottomBar></BottomBar>
+        {/* <BottomBar></BottomBar> */}
     </div>
   )
 }

@@ -1,52 +1,55 @@
-import {Home, Expand, UsersRound, Bookmark, icons, LayoutList, ImagePlus} from 'lucide-react'
+import {
+  Home, Expand, UsersRound, Bookmark, icons, LayoutList, ImagePlus,
+  Coffee, Scale, CircleHelp, Rabbit, Images
+} from 'lucide-react'
 
-export const sidebarLinks = [
-    {
-      route: "/",
-      label: "Home",
-      icon: Home
-    },
-    {
-      route: "/dashboard/explore",
-      label: "Explore",
-      icon: LayoutList
-    },
-    {
-      route: "/all-users",
-      label: "People",
-      icon: UsersRound
-    },
-    {
-      route: "/saved",
-      label: "Saved",
-      icon: Bookmark
-    },
-    {
-      route: "/dashboard/post",
-      label: "Create Post",
-      icon: ImagePlus
-    },
-  ];
-  
-  export const bottombarLinks = [
-    {
-      imgURL: "/assets/icons/home.svg",
-      route: "/",
-      label: "Home",
-    },
-    {
-      imgURL: "/assets/icons/wallpaper.svg",
-      route: "/explore",
-      label: "Explore",
-    },
-    {
-      imgURL: "/assets/icons/bookmark.svg",
-      route: "/saved",
-      label: "Saved",
-    },
-    {
-      imgURL: "/assets/icons/gallery-add.svg",
-      route: "/create-post",
-      label: "Create",
-    },
-  ];
+export const mainNavigate = [
+  {
+    route: "/home",
+    label: "Vào quán",
+    icon: Coffee
+  },
+  {
+    route: "/dashboard/explore",
+    label: "Bảng tin",
+    icon: LayoutList
+  },
+  {
+    route: "/all-users",
+    label: "Mọi người",
+    icon: UsersRound
+  },
+];
+
+
+export const actions = [
+  {
+    route: "/dashboard/create-post",
+    label: "Tạo bài viết",
+    icon: ImagePlus
+  },
+  {
+    route: "/",
+    label: "Bài viết của tôi",
+    icon: Images
+  },
+];
+
+export const references = [
+  {
+    route: "/",
+    label: "Giới thiệu",
+    icon: Rabbit
+  },
+  {
+    route: "/",
+    label: "Hỗ trợ",
+    icon: CircleHelp
+  },
+  {
+    route: "/",
+    label: "Các chính sách",
+    icon: Scale
+  },
+];
+

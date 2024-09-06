@@ -8,8 +8,10 @@ import { redirect, usePathname, useRouter } from 'next/navigation'
 import { useUserContext } from '@/context/AuthContext'
 import { account } from '@/lib/appwrite/config'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { sidebarLinks } from '@/constants'
+import { actions, mainNavigate, references } from '@/constants'
 import { INavLink } from '@/types'
+import { Separator } from '../ui/separator'
+import { Label } from '@radix-ui/react-label'
 const LeftSideBar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
   const { user } = useUserContext();
@@ -23,52 +25,58 @@ const LeftSideBar = () => {
   }, [isSuccess])
 
   return (
-    <nav className='hidden md:flex px-6 py-10 flex-col justify-between min-w-[270px]'>
-      <div className='flex flex-col gap-11'>
-        <Link href={"/"} className='flex gap-3 items-center'>
-          {/* <Image
-                    src={"/logo.png"}
-                    alt='logo'
-                    width={130}
-                    height={325}
-                >
-                </Image> */}
-          <h1 className='text-xl font-bold'>Quán Bar Otaku</h1>
-        </Link>
-        <Link className='flex gap-3 items-center'
-          href={"/"}
-        >
-          <Avatar
-            className="w-16 h-16 border-2 border-gray-300 transition-colors 
-        duration-300 hover:border-blue-400 object-fill"
-          >
-            <AvatarImage
-              src={user?.imageUrl || 'https://github.com/shadcn.png'}
-              alt="User Avatar"
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className='flex flex-col'>
-            <p className='text-[18px] font-bold leading-[140%]'>
-              {user.username}
-            </p>
-            <p className='text-[14px] font-normal leading-[140%] text-gray-500'>
-              @${user.id}
-            </p>
-          </div>
-        </Link>
-        <ul>
-          {sidebarLinks.map((link: INavLink) => {
+    <nav className='hidden md:flex fixed top-[64px] left-0 h-full z-40 w-[270px] px-6  flex-col justify-between
+    border-r-[1px] 
+    ' style={{borderRightColor: 'hsl(var(--border))'}}>
+      <div className='flex flex-col'>
+        <ul className='mt-3'>
+          {mainNavigate.map((link: INavLink) => {
             const isActive = pathname === link.route
             return (
-              <li className='rounded-lg text-[16px] font-medium leading-[140%] transition
-              py-3
-              '
+              <li className='rounded-lg text-[16px] font-medium leading-[140%] transition'
                 key={link.label}>
                 <Link href={link.route} className=''>
                 <Button 
                 variant={isActive ? 'default' : 'ghost'}  // Dynamically set variant based on isActive
-                className='w-32 justify-start'
+                className='w-full justify-start'
+              >
+                <link.icon className='mr-2' size={20} /> {/* Render icon */}
+                {link.label}
+              </Button>
+                </Link>
+              </li>
+            )
+          })}
+            <Separator className='mt-3'></Separator>
+            <li className='my-3 text-secondary-foreground'>HÀNH ĐỘNG</li>
+            {actions.map((link: INavLink) => {
+            const isActive = pathname === link.route
+            return (
+              <li className='rounded-lg text-[16px] font-medium leading-[140%] transition'
+                key={link.label}>
+                <Link href={link.route} className=''>
+                <Button 
+                variant={isActive ? 'default' : 'ghost'}  // Dynamically set variant based on isActive
+                className='w-full justify-start'
+              >
+                <link.icon className='mr-2' size={20} /> {/* Render icon */}
+                {link.label}
+              </Button>
+                </Link>
+              </li>
+            )
+          })}
+            <Separator className='mt-3'></Separator>
+            <li className='my-3 text-secondary-foreground'>TÀI NGUYÊN</li>
+            {references.map((link: INavLink) => {
+            const isActive = pathname === link.route
+            return (
+              <li className='rounded-lg text-[16px] font-medium leading-[140%] transition'
+                key={link.label}>
+                <Link href={link.route} className=''>
+                <Button 
+                variant={isActive ? 'default' : 'ghost'}  // Dynamically set variant based on isActive
+                className='w-full justify-start'
               >
                 <link.icon className='mr-2' size={20} /> {/* Render icon */}
                 {link.label}
@@ -78,6 +86,7 @@ const LeftSideBar = () => {
             )
           })}
         </ul>
+
       </div>
     </nav>
   )
