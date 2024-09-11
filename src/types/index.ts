@@ -14,7 +14,13 @@ export type INavLink = {
     label: string;
     icon: LucideIcon;
   };
-  
+  export type NotificationItem = {
+    id: string
+    avatarUrl: string
+    fallback: string
+    message: string
+    time: string
+  }
   export type IUpdateUser = {
     userId: string;
     name: string;
