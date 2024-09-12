@@ -2,11 +2,11 @@
 
 import React, { useRef, useEffect, Suspense } from 'react';
 import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, useGLTF, useAnimations, useCubeTexture  } from '@react-three/drei';
+import { OrbitControls, useAnimations, useCubeTexture  } from '@react-three/drei';
 import * as THREE from 'three';
 import AnimatedText from './3DText';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
   
 const CameraLogger = () => {
@@ -28,7 +28,8 @@ const CameraLogger = () => {
 };
 
 const Cat = ({ position }: { position: [number, number, number] }) => {
-  const { scene, animations } = useGLTF('/3d/cat/scene.gltf') as any;
+  // const { scene, animations } = useGLTF('/3d/cat/scene.gltf') as any;
+  const { scene, animations } = useLoader(GLTFLoader, "/3d/cat/scene.gltf");
   const ref = useRef<THREE.Group>(null!);
   const { actions } = useAnimations(animations, ref);
 
@@ -54,9 +55,8 @@ interface Props {
   setShowChat: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function ModelViewer({ setShowChat }: Props) {
-  const modelPath = '/3d/scene.gltf';
-  const { scene } = useGLTF(modelPath) as unknown as { scene: THREE.Scene };
+export default function ModelViewer({ setShowChat }: Props) {
+  const { scene } = useLoader(GLTFLoader, "/3d/scene.gltf");
   const cameraRef = useRef<THREE.PerspectiveCamera>(null!);
 
   // Desired camera position and target

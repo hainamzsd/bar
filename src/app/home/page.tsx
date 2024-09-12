@@ -1,42 +1,33 @@
-"use client"
-import React, { useState } from 'react'
-import Head from 'next/head';
-import { ModelViewer } from '../../components/ModelViewer';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Label } from '@/components/ui/label';
-import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
-import { Moon, Sun } from 'lucide-react';
-import Menu from '@/components/Menu';
-import PopChat from '@/components/VNChat';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useState } from "react";
+import Head from "next/head";
+import { useTheme } from "next-themes";
+import Menu from "@/components/Menu";
+import PopChat from "@/components/VNChat";
+import dynamic from "next/dynamic";
+
+const ModelViewer = dynamic(() => import('../../components/ModelViewer') as any, {
+  ssr: false,
+});
+
 export default function Page() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
   const [showChat, setShowChat] = useState(false);
+
   const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light")
-  }
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   return (
     <>
-    <Head>
-      <title>3D Model Viewer</title>
-    </Head>
-    <div style={{ height: '100vh' }}>
-    <ModelViewer setShowChat={setShowChat} />
+      <Head>
+        <title>3D Model Viewer</title>
+      </Head>
+      <div style={{ height: "100vh" }}>
+        <ModelViewer />
         <Menu />
-      <Menu />
-      {showChat && <PopChat setShowChat={setShowChat} />}
-     
-    </div>
-  </>
-  )
+        {showChat && <PopChat setShowChat={setShowChat} />}
+      </div>
+    </>
+  );
 }

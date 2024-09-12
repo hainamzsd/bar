@@ -21,6 +21,8 @@ import Profile from './Profile';
 import { useSignOutAccount } from '@/lib/react-query/queriesAndMutations';
 import { useUserContext } from '@/context/AuthContext';
 import NotificationContent from './notifications-content';
+import Link from 'next/link';
+import { Badge } from './ui/badge';
 
 export default function Menu() {
   const { theme, setTheme } = useTheme()
@@ -56,7 +58,7 @@ export default function Menu() {
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger className='mr-4' asChild>
             <Button
-              variant="outline"
+            variant={'secondary'}
               size="icon"
             >
               <Bell className={`h-[1.2rem] w-[1.2rem] `} />
@@ -73,7 +75,6 @@ export default function Menu() {
     // Add more notifications here
   ]}></NotificationContent>
         </DropdownMenu>
-        <Sheet>
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger className={`flex justify-center items-center p-2
     ${theme === 'light' ? 'bg-white' : 'bg-[#1E293B]'}
@@ -93,25 +94,29 @@ export default function Menu() {
               </Avatar>
               <Label className='ml-3'>{user?.username}</Label>
             </DropdownMenuTrigger>
-            <DropdownMenuContent >
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuContent className='w-72 mr-2 mt-2 px-5 py-4'>
+            <DropdownMenuLabel className='flex items-center'>
+                  <Avatar className="h-10 w-10 mr-2">
+                    <AvatarImage src={user?.imageUrl || 'https://github.com/shadcn.png'} alt="User Avatar" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <div className='flex flex-col'>
+                    <span>{user.username}</span>
+                    <Badge variant={'default'} >Khách hàng</Badge>
+                  </div>
+                </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <SheetTrigger asChild>
-                  <div className='flex'>
+                  <Link href='/dashboard/profile' className='flex'>
                     <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </div>
-                </SheetTrigger>
+                    <span>Hồ sơ cá nhân</span>
+                  </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => signOut()}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span></DropdownMenuItem>
+                <span>Đăng xuất</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Profile />
-        </Sheet>
-
       </div>
 
     </>

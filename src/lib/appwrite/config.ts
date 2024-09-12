@@ -14,11 +14,11 @@ export const appwriteConfig = {
 export const client = new Client().setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_URL as any)
                                   .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID as any);
 if (!appwriteConfig.projectId) {
-  throw new Error('NEXT_APPWRITE_PROJECT_ID is not defined');
+  throw new Error('NEXT_PUBLIC_APPWRITE_PROJECT_ID is not defined');
 }
 
 if (!appwriteConfig.url) {
-  throw new Error('NEXT_APPWRITE_URL is not defined');
+  throw new Error('NEXT_PUBLIC_APPWRITE_URL is not defined');
 }
 export const account = new Account(client);
 export const databases = new Databases(client);

@@ -32,7 +32,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Suspense fallback={<Loading></Loading>}>
-              <Loading></Loading>
+              {children}
               </Suspense>
             </ThemeProvider>
             <Toaster></Toaster>

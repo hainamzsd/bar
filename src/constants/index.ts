@@ -15,7 +15,7 @@ export const mainNavigate = [
     icon: LayoutList
   },
   {
-    route: "/all-users",
+    route: "/dashboard/people",
     label: "Mọi người",
     icon: UsersRound
   },
@@ -29,8 +29,8 @@ export const actions = [
     icon: ImagePlus
   },
   {
-    route: "/",
-    label: "Bài viết của tôi",
+    route: "/dashboard/saved",
+    label: "Bài viết đã lưu",
     icon: Images
   },
 ];

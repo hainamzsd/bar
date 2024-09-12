@@ -21,6 +21,10 @@ import { DatePicker } from '@/components/DatePicker'
 import { Textarea } from '@/components/ui/textarea'
 import ProfileHeader from '@/components/profile/ProfileHeader'
 import ProfileEditForm from '@/components/profile/ProfileEditForm'
+import FollowersModal from '@/components/profile/FollowerModal'
+import FollowingModal from '@/components/profile/FollowingModal'
+import ChangePasswordForm from '@/components/profile/ChangePasswordForm'
+import AchievementsCard from '@/components/profile/AchievementsCard'
 
 export default function ProfileLayout() {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
@@ -36,27 +40,6 @@ export default function ProfileLayout() {
     // Implement saving logic here
     setIsEditingBio(false);
   };
-
-  const handleBackgroundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setBackgroundImage(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const handleInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // setUserInfo({ ...userInfo, [e.target.name]: e.target.value })
-  }
-
-  const handleSave = () => {
-    setIsEditing(false)
-    // Here you would typically send the updated info to your backend
-  }
-
   return (
     <div className="py-8 ">
       <Card className="w-full max-w-7xl mx-auto overflow-hidden">
@@ -117,63 +100,16 @@ export default function ProfileLayout() {
         )}
           {/* <p className="text-muted-foreground mb-4">{user.bio}</p> */}
           <div className="flex space-x-4 mb-6 mt-2">
-            <Dialog open={showFollowersModal} onOpenChange={setShowFollowersModal}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Users className="mr-2 h-4 w-4" />
-                  {user.followers.length} Followers
-                </Button>
-              </DialogTrigger>
-              <DialogContent className='max-w-md'>
-                <DialogHeader>
-                  <DialogTitle>Followers</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  {[1, 2, 3].map((follower) => (
-                    <div key={follower} className="flex items-center justify-between space-x-4">
-                      <div className='flex items-center'>
-                      <Avatar>
-                        <AvatarFallback>{follower}</AvatarFallback>
-                      </Avatar>
-                      <div className='ml-2'>
-                        <p className="font-semibold">User {follower}</p>
-                      </div>
-                      </div>
-                      <Button variant="outline" size="sm" className="ml-auto">Follow</Button>
-                    </div>
-                  ))}
-                </div>
-              </DialogContent>
-            </Dialog>
-            <Dialog open={showFollowingModal} onOpenChange={setShowFollowingModal}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <User className="mr-2 h-4 w-4" />
-                  {user.following.length} Following
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Following</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  {[1, 2, 3].map((following) => (
-                    <div key={following} className="flex items-center justify-between space-x-4">
-                      <Avatar>
-                        <AvatarFallback>U{following}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                      <div>
-                        <p className="font-semibold">User {following}</p>
-                        <p className="text-sm text-muted-foreground">@user{following}</p>
-                      </div>
-                      <Button variant="outline" size="sm" className="ml-auto">Unfollow</Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </DialogContent>
-            </Dialog>
+          <FollowersModal
+        showFollowersModal={showFollowersModal}
+        setShowFollowersModal={setShowFollowersModal}
+        followers={user.followers}
+      />
+      <FollowingModal
+        showFollowingModal={showFollowingModal}
+        setShowFollowingModal={setShowFollowingModal}
+        following={user.following}
+      />
           </div>
           <Tabs defaultValue="personal" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
@@ -209,55 +145,10 @@ export default function ProfileLayout() {
             <UserInfoCard userInfo={user} />
             </TabsContent>
             <TabsContent value="password">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Change Password</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input id="confirm-password" type="password" />
-                  </div>
-                  <Button className="w-full">
-                    <Lock className="mr-2 h-4 w-4" /> Change Password
-                  </Button>
-                </CardContent>
-              </Card>
+             <ChangePasswordForm></ChangePasswordForm>
             </TabsContent>
             <TabsContent value="achievements">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Achievements</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {[
-                      { title: "5 Year Milestone", description: "Celebrating 5 years with the company" },
-                      { title: "Top Contributor", description: "Recognized for outstanding contributions" },
-                      { title: "Innovation Award", description: "For developing a groundbreaking feature" },
-                      { title: "Mentor of the Year", description: "Acknowledged for exceptional mentorship" },
-                    ].map((achievement, index) => (
-                      <Card key={index}>
-                        <CardContent className="flex items-center p-4">
-                          <Trophy className="h-8 w-8 text-yellow-500 mr-4" />
-                          <div>
-                            <h3 className="font-semibold">{achievement.title}</h3>
-                            <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+             <AchievementsCard></AchievementsCard>
             </TabsContent>
           </Tabs>
           <Separator className="my-8" />
