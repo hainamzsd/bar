@@ -43,13 +43,13 @@ export default function ProfileLayout() {
   return (
     <div className="py-8 ">
       <Card className="w-full max-w-7xl mx-auto overflow-hidden">
-       <ProfileHeader user={{
-        imageUrl:user.imageUrl,
-        username:user.username,
-        imgBackground:undefined
-       }}
-       
-       ></ProfileHeader>
+        <ProfileHeader user={{
+          imageUrl: user.imageUrl,
+          username: user.username,
+          imgBackground: undefined
+        }}
+
+        ></ProfileHeader>
         <CardContent className="pt-24">
           <div className="flex justify-between items-start mb-4">
             <div>
@@ -63,101 +63,102 @@ export default function ProfileLayout() {
                   <Edit className="mr-2 h-4 w-4" /> Sửa thông tin
                 </Button>
               </DialogTrigger>
-             <ProfileEditForm user={user} 
-            ></ProfileEditForm>
+              <ProfileEditForm user={user}
+              ></ProfileEditForm>
             </Dialog>
           </div>
           {!user.bio ? (
-          <div className="flex items-center space-x-2">
-            <Edit3 className="h-5 w-5 text-muted-foreground" />
-            <span className="cursor-pointer" onClick={() => setIsEditingBio(true)}>Tiểu sử</span>
-          </div>
-        ) : (
-          <div>
             <div className="flex items-center space-x-2">
-              <span className="font-semibold">Tiểu sử:</span>
-              <p>{user.bio}</p>
-              <Edit3 className="h-5 w-5 text-muted-foreground cursor-pointer" onClick={() => setIsEditingBio(true)} />
+              <Edit3 className="h-5 w-5 text-muted-foreground" />
+              <span className="cursor-pointer" onClick={() => setIsEditingBio(true)}>Tiểu sử</span>
             </div>
-          </div>
-        )}
-        {isEditingBio && (
-          <div className="mt-4">
-            <Textarea
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={user.bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="Thêm tiểu sử..."
-            />
-            <Button
-            variant={'ghost'}
-              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
-              onClick={handleSaveBio}
-            >
-              Lưu
-            </Button>
-          </div>
-        )}
+          ) : (
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold">Tiểu sử:</span>
+                <p>{user.bio}</p>
+                <Edit3 className="h-5 w-5 text-muted-foreground cursor-pointer" onClick={() => setIsEditingBio(true)} />
+              </div>
+            </div>
+          )}
+          {isEditingBio && (
+            <div className="mt-4">
+              <Textarea
+                className="w-full p-2 border border-gray-300 rounded-md"
+                value={user.bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Thêm tiểu sử..."
+              />
+              <Button
+                variant={'ghost'}
+                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+                onClick={handleSaveBio}
+              >
+                Lưu
+              </Button>
+            </div>
+          )}
           {/* <p className="text-muted-foreground mb-4">{user.bio}</p> */}
-          <div className="flex space-x-4 mb-6 mt-2">
-          <FollowersModal
-        showFollowersModal={showFollowersModal}
-        setShowFollowersModal={setShowFollowersModal}
-        followers={user.followers}
-      />
-      <FollowingModal
-        showFollowingModal={showFollowingModal}
-        setShowFollowingModal={setShowFollowingModal}
-        following={user.following}
-      />
+          <div className="flex flex-col md:flex-row md:space-x-4 mb-6 mt-2 space-y-4 md:space-y-0">
+            <FollowersModal
+              showFollowersModal={showFollowersModal}
+              setShowFollowersModal={setShowFollowersModal}
+              followers={user.followers}
+            />
+            <FollowingModal
+              showFollowingModal={showFollowingModal}
+              setShowFollowingModal={setShowFollowingModal}
+              following={user.following}
+       // Ensure it takes available space
+            />
           </div>
           <Tabs defaultValue="personal" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger
-          value="personal"
-          className="flex items-center justify-center space-x-2 md:space-x-0 md:justify-center"
-        >
-          <div className="hidden md:block">Thông tin cá nhân</div>
-          <div className="block md:hidden">
-            <User className="h-5 w-5" />
-          </div>
-        </TabsTrigger>
-        <TabsTrigger
-          value="password"
-          className="flex items-center justify-center space-x-2 md:space-x-0 md:justify-center"
-        >
-          <div className="hidden md:block">Đổi mật khẩu</div>
-          <div className="block md:hidden">
-            <Lock className="h-5 w-5" />
-          </div>
-        </TabsTrigger>
-        <TabsTrigger
-          value="achievements"
-          className="flex items-center justify-center space-x-2 md:space-x-0 md:justify-center"
-        >
-          <div className="hidden md:block">Thành tựu</div>
-          <div className="block md:hidden">
-            <Trophy className="h-5 w-5" />
-          </div>
-        </TabsTrigger>
+              <TabsTrigger
+                value="personal"
+                className="flex items-center justify-center space-x-2 md:space-x-0 md:justify-center"
+              >
+                <div className="hidden md:block">Thông tin cá nhân</div>
+                <div className="block md:hidden">
+                  <User className="h-5 w-5" />
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="password"
+                className="flex items-center justify-center space-x-2 md:space-x-0 md:justify-center"
+              >
+                <div className="hidden md:block">Đổi mật khẩu</div>
+                <div className="block md:hidden">
+                  <Lock className="h-5 w-5" />
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="achievements"
+                className="flex items-center justify-center space-x-2 md:space-x-0 md:justify-center"
+              >
+                <div className="hidden md:block">Thành tựu</div>
+                <div className="block md:hidden">
+                  <Trophy className="h-5 w-5" />
+                </div>
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="personal">
-            <UserInfoCard userInfo={user} />
+              <UserInfoCard userInfo={user} />
             </TabsContent>
             <TabsContent value="password">
-             <ChangePasswordForm></ChangePasswordForm>
+              <ChangePasswordForm></ChangePasswordForm>
             </TabsContent>
             <TabsContent value="achievements">
-             <AchievementsCard></AchievementsCard>
+              <AchievementsCard></AchievementsCard>
             </TabsContent>
           </Tabs>
           <Separator className="my-8" />
           <div>
             <h2 className="text-2xl font-bold mb-4">Posts</h2>
             <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((post) => (
-            <PostCard key={post} />
-          ))}
+              {[1, 2, 3, 4, 5].map((post) => (
+                <PostCard key={post} />
+              ))}
             </div>
           </div>
         </CardContent>

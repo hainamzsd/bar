@@ -13,16 +13,16 @@ import {
 import { Label } from '@/components/ui/label';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { Bell, LogOut, Moon, Sun, User } from 'lucide-react';
-import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from './ui/sheet';
-import { Input } from './ui/input';
+import { Bell, LayoutList, LogOut, Moon, Sun, User } from 'lucide-react';
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '../ui/sheet';
+import { Input } from '../ui/input';
 import { useRouter } from 'next/navigation';
-import Profile from './Profile';
+import Profile from '../Profile';
 import { useSignOutAccount } from '@/lib/react-query/queriesAndMutations';
 import { useUserContext } from '@/context/AuthContext';
-import NotificationContent from './notifications-content';
+import NotificationContent from '../notifications-content';
 import Link from 'next/link';
-import { Badge } from './ui/badge';
+import { Badge } from '../ui/badge';
 
 export default function Menu() {
   const { theme, setTheme } = useTheme()
@@ -94,7 +94,7 @@ export default function Menu() {
               </Avatar>
               <Label className='ml-3'>{user?.username}</Label>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className='w-72 mr-2 mt-2 px-5 py-4'>
+            <DropdownMenuContent className='mr-2 mt-2 px-5 py-4'>
             <DropdownMenuLabel className='flex items-center'>
                   <Avatar className="h-10 w-10 mr-2">
                     <AvatarImage src={user?.imageUrl || 'https://github.com/shadcn.png'} alt="User Avatar" />
@@ -110,6 +110,12 @@ export default function Menu() {
                   <Link href='/dashboard/profile' className='flex'>
                     <User className="mr-2 h-4 w-4" />
                     <span>Hồ sơ cá nhân</span>
+                  </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                  <Link href='/dashboard/explore' className='flex'>
+                    <LayoutList className="mr-2 h-4 w-4" />
+                    <span>Đi tới bảng tin</span>
                   </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => signOut()}>

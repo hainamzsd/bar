@@ -1,5 +1,6 @@
 "use client";
 
+import { toast, useToast } from '@/hooks/use-toast';
 import { getCurrentUser } from '@/lib/appwrite/api';
 import { IContextType, IUser } from '@/types';
 import { useRouter } from 'next/navigation';
@@ -35,6 +36,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<IUser>(INITAL_USER);
     const [isLoading, setIsLoading] = useState(true); // Set to true initially
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const {toast} = useToast();
     const router = useRouter();
 
     const checkAuthUser = async () => {

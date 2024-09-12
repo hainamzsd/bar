@@ -18,7 +18,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({ showFollowersModal, set
           {followers.length} Người theo dõi
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className='md:max-w-md max-w-80 rounded-md'>
         <DialogHeader>
           <DialogTitle>Người đang theo dõi</DialogTitle>
         </DialogHeader>
