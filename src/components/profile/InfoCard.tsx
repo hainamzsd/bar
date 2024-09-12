@@ -14,15 +14,15 @@ const UserInfoCard: React.FC<{ userInfo: IUser }> = ({ userInfo }) => {
       </CardHeader>
       <CardContent className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <Mail className="h-5 w-5 text-muted-foreground" />
             <span>{userInfo.email}</span>
             <Lock className="h-3 w-3 text-muted-foreground" ></Lock>
-          </div>
+          </div> */}
           {userInfo.dob && (
             <div className="flex items-center space-x-2">
               <Calendar className="h-5 w-5 text-muted-foreground" />
-              <span>Ngày sinh: {userInfo.dob}</span>
+              <span>Ngày sinh: {formatDate(userInfo.dob)}</span>
             </div>
           )}
           <div className="flex items-center space-x-2">

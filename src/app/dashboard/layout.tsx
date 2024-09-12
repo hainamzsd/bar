@@ -33,8 +33,7 @@ const Layout = ({children}: {children: React.ReactNode}) => {
             {children}
 
         </section>
-        </Suspense>
-
+            </Suspense>
         {/* <BottomBar></BottomBar> */}
     </div>
   )

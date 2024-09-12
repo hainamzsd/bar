@@ -20,7 +20,13 @@ export const stringToGender = (value: string): boolean | undefined => {
 };
 
 export function formatDate(dateString: string): string {
+  if (!dateString) return "N/A"; // Handle missing or empty date values
+  
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    // Handle invalid date
+    return "Invalid date";
+  }
+  
   return format(date, 'dd-MM-yyyy');
 }
-

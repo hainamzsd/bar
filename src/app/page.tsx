@@ -8,15 +8,22 @@ import { useTheme } from "next-themes"
 import { useRouter } from 'next/navigation'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import SignInDialog from "@/components/_auth/SignInForm";
 import SignUpDialog from "@/components/_auth/SignUpForm";
+import { useUserContext } from "@/context/AuthContext";
 
 export default function Home() {
   const { theme, setTheme } = useTheme()
   const [isLogin, setIsLogin] = useState(true);
-  const router = useRouter()
+  const { isAuthenticated, isLoading } = useUserContext();
+  const router = useRouter();
+  useEffect(() => {
+    if (isAuthenticated) {
+        router.push('/dashboard/explore'); 
+    }
+}, [isAuthenticated, isLoading, router]);
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light")
   }

@@ -47,14 +47,16 @@ export async function saveUserToDB(user: {
 }
 
 export async function signInAccount(user: {
-    email:string;
-    password:string
-}){
-    try{
-        const session = await account.createEmailPasswordSession(user.email,user.password);
+    email: string;
+    password: string;
+}) {
+    try {
+        const session = await account.createEmailPasswordSession(user.email, user.password);
         return session;
-    }catch(error){
-        console.log(error)
+    } catch (error: any) {
+        console.log("Error during sign-in:", error);
+        // Re-throw the error to pass it up to the caller
+        throw error; 
     }
 }
 export async function signInFacebook() {
@@ -62,8 +64,8 @@ export async function signInFacebook() {
         // Create OAuth session
         const session = await account.createOAuth2Session(
             OAuthProvider.Facebook, // provider
-            `http://localhost:3000/oauth2`,
-		`http://localhost:3000/`,
+            `https://bar-git-main-hainamzsds-projects.vercel.app/oauth2`, // Update this to the correct URL
+  `https://bar-git-main-hainamzsds-projects.vercel.app/`
         );
         return session;
     } catch (error) {

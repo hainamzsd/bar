@@ -51,22 +51,23 @@ export default function ProfileLayout() {
 
         ></ProfileHeader>
         <CardContent className="pt-24">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h1 className="text-3xl font-bold">{user.username}</h1>
-              {/* <p className="text-xl text-muted-foreground">{userInfo.username}</p> */}
-              <Badge className="mt-2" >Khách hàng</Badge>
-            </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Edit className="mr-2 h-4 w-4" /> Sửa thông tin
-                </Button>
-              </DialogTrigger>
-              <ProfileEditForm user={user}
-              ></ProfileEditForm>
-            </Dialog>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-4">
+  <div className="flex-1 min-w-0">
+    <h1 className="text-3xl font-bold break-all">{user.username}dawdwaadw</h1>
+    {/* <p className="text-xl text-muted-foreground">{userInfo.username}</p> */}
+    <Badge className="mt-2">Khách hàng</Badge>
+  </div>
+  <div className="mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto">
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="w-full sm:w-auto">
+          <Edit className="mr-2 h-4 w-4" /> Sửa thông tin
+        </Button>
+      </DialogTrigger>
+      <ProfileEditForm user={user} />
+    </Dialog>
+  </div>
+</div>
           {!user.bio ? (
             <div className="flex items-center space-x-2">
               <Edit3 className="h-5 w-5 text-muted-foreground" />

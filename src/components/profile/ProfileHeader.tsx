@@ -1,7 +1,7 @@
 import { useState, ChangeEvent } from 'react';
 import Cropper from 'react-easy-crop';
 import { Button } from '@/components/ui/button';
-import { Camera, Check, X } from 'lucide-react';
+import { Camera, Check, X, Edit2 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { getCroppedImg } from '@/lib/cropImage';
@@ -15,15 +15,15 @@ import {
 
 const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgBackground: string | undefined } }> = ({ user }) => {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(user.imgBackground || null);
-  const [originalImage, setOriginalImage] = useState<string | null>(null); // Store original image
-  const [imageToCrop, setImageToCrop] = useState<string | null>(null); // Image being cropped
-  const [croppedImage, setCroppedImage] = useState<string | null>(null); // Final cropped image
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [repositionMode, setRepositionMode] = useState(false); // Toggle reposition mode
+  const [repositionMode, setRepositionMode] = useState(false);
+  const [avatarImage, setAvatarImage] = useState<string>(user.imageUrl);
   const { toast } = useToast();
 
-  // Handle image upload
   const handleBackgroundUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -37,39 +37,51 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
           });
           return;
         }
-        setOriginalImage(reader.result as string); // Store the original image
-        setImageToCrop(reader.result as string); // Use the same image for cropping
+        setOriginalImage(reader.result as string);
+        setImageToCrop(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Handle cropping completion
   const handleCropComplete = async (croppedArea: any, croppedAreaPixels: any) => {
-    const croppedImage = await getCroppedImg(originalImage!, croppedAreaPixels); // Use original image for cropping
+    const croppedImage = await getCroppedImg(originalImage!, croppedAreaPixels);
     setCroppedImage(croppedImage);
   };
 
-  // Save the cropped image
   const handleSave = () => {
     if (croppedImage) {
       setBackgroundImage(croppedImage);
       setImageToCrop(null);
-      setRepositionMode(false); // Exit reposition mode after saving
+      setRepositionMode(false);
     }
   };
 
-  // Cancel cropping
   const handleCancel = () => {
     setImageToCrop(null);
-    setRepositionMode(false); // Exit reposition mode
+    setRepositionMode(false);
   };
 
-  // Reposition the image (use the original for cropping)
   const handleReposition = () => {
     if (originalImage) {
-      setImageToCrop(originalImage); // Reuse the original image for repositioning
-      setRepositionMode(true); // Enter reposition mode
+      setImageToCrop(originalImage);
+      setRepositionMode(true);
+    }
+  };
+
+  const handleAvatarUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarImage(reader.result as string);
+        // Here you would typically upload the new avatar to your server
+        toast({
+          title: 'Thành công',
+          description: 'Avatar tải lên thành công',
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -82,10 +94,10 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
           <div className="relative w-full h-full">
             <div className="absolute top-2 left-2 z-20 flex space-x-2">
               <Button variant="outline" onClick={handleSave}>
-                <Check></Check>
+                <Check className="h-4 w-4" />
               </Button>
               <Button variant="outline" onClick={handleCancel}>
-                <X></X>
+                <X className="h-4 w-4" />
               </Button>
             </div>
             <div className="relative w-full h-full z-10">
@@ -147,10 +159,26 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
         )}
       </div>
       <div className="absolute bottom-0 left-8 transform translate-y-1/2 z-30">
-        <Avatar className="w-40 h-40 border-4 border-background shadow-lg">
-          <AvatarImage src={user.imageUrl} alt={user.username} />
-          <AvatarFallback>{user.username.split(' ').map((n) => n[0]).join('')}</AvatarFallback>
-        </Avatar>
+        <div className="relative group">
+          <Avatar className="w-40 h-40 border-4 border-background shadow-lg">
+            <AvatarImage src={user.imageUrl ? user.imageUrl : avatarImage} alt={user.username} className='object-cover'/>
+            <AvatarFallback>{user.username.split(' ').map((n) => n[0]).join('')}</AvatarFallback>
+          </Avatar>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <label htmlFor="avatar-upload" className="cursor-pointer">
+              <div className="absolute bottom-1 right-4 bg-primary text-primary-foreground rounded-full p-2">
+                <Edit2 className="h-4 w-4" />
+              </div>
+            </label>
+          </div>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarUpload}
+          />
+        </div>
       </div>
     </div>
   );
