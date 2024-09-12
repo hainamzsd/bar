@@ -52,7 +52,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     bio: currentAccount.bio,
                     followers: currentAccount.followers,
                     following: currentAccount.following,
-                    joinDate: currentAccount.$createdAt
+                    joinDate: currentAccount.$createdAt,
+                    dob: currentAccount.dob
                 });
                 setIsAuthenticated(true);
                 return true;

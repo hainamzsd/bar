@@ -17,6 +17,7 @@ import { useTheme } from 'next-themes'
 import { Input } from '../ui/input'
 import LeftSideBar from './LeftSideBar'
 import NotificationContent from '../notifications-content'
+import SearchComponent from '../ExploreSearch'
 
 const TopBar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -169,34 +170,7 @@ const TopBar = () => {
       </div>
 
       {/* Mobile search overlay */}
-      <div 
-        className={`fixed inset-0 bg-background z-50 transition-opacity duration-300 ${
-          isSearchOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="p-4">
-          <div className="flex items-center mb-4">
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(false)} className="mr-2">
-              <X className="h-6 w-6" />
-            </Button>
-            <h2 className="text-lg font-semibold">Search</h2>
-          </div>
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-            <Input 
-              type="text" 
-              placeholder="Search..." 
-              className="pl-10 pr-4 py-2 w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
-          <div className="mt-4">
-            {/* Add search suggestions or results here */}
-            <p className="text-muted-foreground">Recent searches or suggestions can go here</p>
-          </div>
-        </div>
-      </div>
+      <SearchComponent isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)}  />
     </>
   )
 }
