@@ -116,8 +116,10 @@ const TopBar = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
+                  <Link href={"/dashboard/profile"} className='flex justify-center'>
                   <User className="mr-2 h-4 w-4" />
                   <span>Hồ sơ cá nhân</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                   <div className='flex items-center justify-between w-full'>

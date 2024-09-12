@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from "@/context/AuthContext";
 import QueryProvider from "@/lib/react-query/queryProvider";
+import { Suspense } from "react";
+import Loading from "./loading";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,7 +31,9 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              {children}
+              <Suspense fallback={<Loading></Loading>}>
+              <Loading></Loading>
+              </Suspense>
             </ThemeProvider>
             <Toaster></Toaster>
           </AuthProvider>

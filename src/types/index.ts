@@ -9,6 +9,7 @@ export type IContextType = {
   checkAuthUser: () => Promise<boolean>;
 }
 
+
 export type INavLink = {
     route: string;
     label: string;
@@ -50,12 +51,17 @@ export type INavLink = {
   
   export type IUser = {
     id: string;
-    username: string;
-    email: string;
     imageUrl: string;
-    bio: string;
-    dob?: Date | null;
-    gender?: boolean | null
+    dob?: string | undefined;
+    username: string;
+    bio?: string;
+    email: string;
+    joinDate: string;
+    gender?: boolean | undefined;
+    followers: string[];  
+    following: string[];  
+    facebook?: string | undefined;
+    twitter?: string | undefined;
   };
   
   export type INewUser = {

@@ -9,7 +9,7 @@ import { PostCard } from './post-card'
 
 const ExplorePage = () => {
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="mx-auto space-y-8">
     <section className="bg-accent rounded-lg shadow-lg overflow-hidden">
         <div className="p-6">
           <h2 className="text-3xl font-bold mb-4 text-accent-foreground">Anime News & Announcements</h2>

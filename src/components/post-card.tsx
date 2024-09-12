@@ -7,12 +7,13 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { BookmarkIcon, HeartIcon, MessageCircleIcon, MoreHorizontalIcon, PaperclipIcon, SendIcon } from "lucide-react"
+import Image from "next/image"
 
 export function PostCard() {
   const [showReply, setShowReply] = useState(false)
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full ">
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="rounded-full">
           <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User avatar" />
@@ -30,29 +31,29 @@ export function PostCard() {
       <CardContent className="space-y-4">
         <h2 className="text-xl font-bold">Post Title Goes Here</h2>
         <img
-          src="/placeholder.svg?height=300&width=400"
+          src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/c27dc0a4-6276-4036-968e-51b70613de6d/dfbouue-a609b605-d553-4450-b56e-9cd707317231.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2MyN2RjMGE0LTYyNzYtNDAzNi05NjhlLTUxYjcwNjEzZGU2ZFwvZGZib3V1ZS1hNjA5YjYwNS1kNTUzLTQ0NTAtYjU2ZS05Y2Q3MDczMTcyMzEuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.49hw3fXDtkGsM1XMh3yk-kwhdUCeRfXTwtdeQnrfuZ0"
           alt="Post image"
-          className="w-full h-auto rounded-md"
+          className="md:max-w-lg h-auto rounded-md"
         />
         <p className="text-sm">This is the content of the post. It can be a longer text describing the image or sharing thoughts. #hashtag</p>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm">
-            <HeartIcon className="h-4 w-4 mr-2" />
-            1.5k
-          </Button>
-          <Button variant="ghost" size="sm">
-            <MessageCircleIcon className="h-4 w-4 mr-2" />
-            234
-          </Button>
-          <Button variant="ghost" size="sm">
-            <SendIcon className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-          <Button variant="ghost" size="sm" className="ml-auto">
-            <BookmarkIcon className="h-4 w-4" />
-            <span className="sr-only">Save post</span>
-          </Button>
-        </div>
+        <div className="flex flex-wrap items-center gap-2">
+      <Button variant="ghost" size="sm">
+        <HeartIcon className="h-4 w-4 mr-2" />
+        1.5k
+      </Button>
+      <Button variant="ghost" size="sm">
+        <MessageCircleIcon className="h-4 w-4 mr-2" />
+        234
+      </Button>
+      <Button variant="ghost" size="sm">
+        <SendIcon className="h-4 w-4 mr-2" />
+        Share
+      </Button>
+      <Button variant="ghost" size="sm" className="ml-auto">
+        <BookmarkIcon className="h-4 w-4" />
+        <span className="sr-only">Save post</span>
+      </Button>
+    </div>
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-4">
         <form className="flex w-full items-start space-x-2">
@@ -80,8 +81,8 @@ export function PostCard() {
             <div className="flex-grow">
               <div className="bg-muted p-2 rounded-md">
                 <p className="text-sm font-semibold">Commenter Name</p>
-                <p className="text-xs text-muted-foreground">1 hour ago</p>
                 <p className="text-sm mt-1">This is a sample comment on the post. It can be a reaction or a question about the content.</p>
+                <p className="text-xs text-muted-foreground">1 hour ago</p>
               </div>
               <div className="mt-2 flex items-center gap-4">
                 <Button variant="ghost" size="sm">Like</Button>

@@ -11,8 +11,13 @@ export const INITAL_USER: IUser = {
     email: '',
     imageUrl: '',
     bio: '',
-    dob: null,
-    gender: null,
+    dob: undefined,
+    gender: undefined,
+    joinDate: new Date().toLocaleDateString("vi-VN"),
+    followers: [],
+    following: [],
+    facebook: undefined,
+    twitter: undefined,
 };
 
 const INITIAL_STATE: IContextType = {
@@ -43,6 +48,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     email: currentAccount.email,
                     imageUrl: currentAccount.imageUrl,
                     bio: currentAccount.bio,
+                    followers: currentAccount.followers,
+                    following: currentAccount.following,
+                    joinDate: currentAccount.$createdAt
                 });
                 setIsAuthenticated(true);
                 return true;
