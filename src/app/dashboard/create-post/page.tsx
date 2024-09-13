@@ -1,4 +1,4 @@
-import { CreatePost } from '@/components/create-post'
+import { CreatePost } from '@/components/post-related/create-post'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 

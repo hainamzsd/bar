@@ -23,6 +23,7 @@ import { useUserContext } from '@/context/AuthContext';
 import NotificationContent from '../notifications-content';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
+import { getRoleTranslation } from '@/lib/utils';
 
 export default function Menu() {
   const { theme, setTheme } = useTheme()
@@ -94,7 +95,7 @@ export default function Menu() {
               </Avatar>
               <Label className='ml-3'>{user?.username}</Label>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className='mr-2 mt-2 px-5 py-4'>
+            <DropdownMenuContent className='mr-2 mt-2 px-5 w-64 py-4'>
             <DropdownMenuLabel className='flex items-center'>
                   <Avatar className="h-10 w-10 mr-2">
                     <AvatarImage src={user?.imageUrl || 'https://github.com/shadcn.png'} alt="User Avatar" />
@@ -102,23 +103,25 @@ export default function Menu() {
                   </Avatar>
                   <div className='flex flex-col'>
                     <span>{user.username}</span>
-                    <Badge variant={'default'} >Khách hàng</Badge>
+                    <Badge variant={'default'} >{getRoleTranslation(user.role)}</Badge>
                   </div>
                 </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem className='py-3'>
                   <Link href='/dashboard/profile' className='flex'>
                     <User className="mr-2 h-4 w-4" />
                     <span>Hồ sơ cá nhân</span>
                   </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className='py-3'>
                   <Link href='/dashboard/explore' className='flex'>
                     <LayoutList className="mr-2 h-4 w-4" />
                     <span>Đi tới bảng tin</span>
                   </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => signOut()}>
+              <DropdownMenuItem 
+              className='py-3'
+              onClick={() => signOut()}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Đăng xuất</span></DropdownMenuItem>
             </DropdownMenuContent>

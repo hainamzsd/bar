@@ -18,6 +18,7 @@ import { Input } from '../ui/input'
 import LeftSideBar from './LeftSideBar'
 import NotificationContent from '../notifications-content'
 import SearchComponent from '../ExploreSearch'
+import { getRoleTranslation } from '@/lib/utils'
 
 const TopBar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -97,8 +98,8 @@ const TopBar = () => {
               ]} />
             </DropdownMenu>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
                 <Avatar className="border-2 border-primary">
                   <AvatarImage src={user?.imageUrl || 'https://github.com/shadcn.png'} alt="User Avatar" />
                   <AvatarFallback>CN</AvatarFallback>
@@ -112,17 +113,19 @@ const TopBar = () => {
                   </Avatar>
                   <div className='flex flex-col'>
                     <span>{user.username}</span>
-                    <Badge>Khách hàng</Badge>
+                    <Badge>{getRoleTranslation(user.role)}</Badge>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem className='py-3'>
                   <Link href={"/dashboard/profile"} className='flex justify-center'>
                   <User className="mr-2 h-4 w-4" />
                   <span>Hồ sơ cá nhân</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuItem
+                className='py-3'
+                onSelect={(e) => e.preventDefault()}>
                   <div className='flex items-center justify-between w-full'>
                     <div className='flex items-center'>
                       <Moon className="mr-2 h-4 w-4" />
@@ -131,7 +134,9 @@ const TopBar = () => {
                     <Switch id="nightlight" checked={isDarkMode} onCheckedChange={toggleTheme} />
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {
+                <DropdownMenuItem 
+                className='py-3'
+                onClick={() => {
                   signOut()
                   router.replace("/");
                   }}>

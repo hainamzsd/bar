@@ -1,4 +1,4 @@
-import { INewUser } from "@/types";
+import { INewUser, IUser } from "@/types";
 import {ID, Models, OAuthProvider, Query} from 'appwrite'
 import { account, appwriteConfig, avatars, databases } from "./config";
 
@@ -13,10 +13,13 @@ export async function createUserAccount(user: INewUser){
         if(!newAccount) throw Error;
         const avatarUrl = avatars.getInitials(user.username);
         const newUser = await saveUserToDB({
-            accountId: newAccount.$id,
+            id: newAccount.$id,
             email: newAccount.email,
             username: user.username,
-            imageUrl: avatarUrl,
+            imageUrl: String(avatarUrl),
+            joinDate: new Date().toLocaleDateString("vi-VN"),
+            isActive: true,
+            role: 'customer'
         })
         return newUser;
     }catch(error){
@@ -26,25 +29,37 @@ export async function createUserAccount(user: INewUser){
     }
 }
 
-export async function saveUserToDB(user: {
-    accountId: string;
-    email: string;
-    username: string;
-    imageUrl: URL;
-}){
-    try{
-        const newUser = await databases.createDocument(
-            appwriteConfig.databaseId as any, 
+
+export async function saveUserToDB(user: IUser) {
+    try {
+        // Check if the user already exists
+        const existingUser = await databases.listDocuments(
+            appwriteConfig.databaseId as any,
             appwriteConfig.userCollectionId as any,
-            ID.unique(), 
+            [Query.equal("id", user.id)]
+        );
+
+        if (existingUser.total > 0) {
+            // If the user already exists, do not create a new one
+            console.log("User already exists in the database.");
+            return existingUser.documents[0];
+        }
+
+        // If the user does not exist, create a new document
+        const newUser = await databases.createDocument(
+            appwriteConfig.databaseId as any,
+            appwriteConfig.userCollectionId as any,
+            ID.unique(),  // Use a unique ID for the new document
             user
         );
-        return newUser
-    }catch(error){
-        console.log(error)
-    }
 
+        return newUser;
+    } catch (error) {
+        console.error("Error saving user to database:", error);
+        throw error;  // Re-throw the error to be handled by the caller
+    }
 }
+
 
 export async function signInAccount(user: {
     email: string;
@@ -64,8 +79,8 @@ export async function signInFacebook() {
         // Create OAuth session
         const session = await account.createOAuth2Session(
             OAuthProvider.Facebook, // provider
-            `https://bar-git-main-hainamzsds-projects.vercel.app/oauth2`, // Update this to the correct URL
-  `https://bar-git-main-hainamzsds-projects.vercel.app/`
+            `http://localhost:3000/oauth2`, // Update this to the correct URL
+  `http://localhost:3000/`
         );
         return session;
     } catch (error) {
@@ -79,9 +94,8 @@ export async function getCurrentUser(){
         const currentUser = await databases.listDocuments(
             appwriteConfig.databaseId as any,
             appwriteConfig.userCollectionId as any,
-            [Query.equal('accountId', currentAccount.$id)]
+            [Query.equal('id', currentAccount.$id)]
         )
-
         if(!currentUser) throw Error;
         return currentUser.documents[0];
     }catch(error){

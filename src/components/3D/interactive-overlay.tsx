@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Trophy, Coffee, Lock } from "lucide-react"
 import { useToast } from '@/hooks/use-toast'
 import { ElegantMenuComponent } from './elegant-menu'
+import { DrinkChallengeModalComponent } from './drink-challenge-modal'
 
 const puzzleHints = [
   "The first letter is the same as the last letter of 'espresso'.",
@@ -62,9 +63,7 @@ export function InteractiveOverlayComponent() {
         </Button>
 
         {/* Coffee button */}
-        <Button onClick={() => setIsOrderOpen(true)} variant="outline" size="icon">
-          <Coffee className="h-[1.2rem] w-[1.2rem]" />
-        </Button>
+        <DrinkChallengeModalComponent></DrinkChallengeModalComponent>
 
         {/* Trophy button */}
         <Dialog>

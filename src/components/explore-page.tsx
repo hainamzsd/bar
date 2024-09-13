@@ -5,9 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ExternalLink, Sparkles, TrendingUp, Users } from 'lucide-react'
-import { PostCard } from './post-card'
+import { PostCard } from './post-related/post-card'
+import { useGetAllPosts } from '@/lib/react-query/postQueriesAndMutations'
+import PostSkeleton from './skeleton/post-skeleton'
+import { PostFromAPI } from '@/types/post'
 
 const ExplorePage = () => {
+  const { data: posts, isPending, isError } = useGetAllPosts();
+
   return (
     <div className="mx-auto space-y-8">
     <section className="bg-accent rounded-lg shadow-lg overflow-hidden">
@@ -38,9 +43,19 @@ const ExplorePage = () => {
         <h2 className="text-2xl font-bold mb-4">Explore Anime Posts</h2>
         <div className="grid gap-6">
           {/* PostCard components are commented out as requested */}
-          {[1, 2, 3, 4, 5].map((post) => (
-            <PostCard key={post} />
-          ))}
+          {isPending?
+          <>
+           {[...Array(5)].map((_, index) => (
+          <PostSkeleton key={index} />
+        ))}</>
+          :
+          <>
+           {posts?.map((post) => (
+            <PostCard key={post.id}
+            post={post as PostFromAPI}
+            />
+          ))}</>
+          }
           <div className="bg-card rounded-lg shadow-md p-4 text-center">
             <p className="text-muted-foreground">Post cards are currently hidden.</p>
           </div>

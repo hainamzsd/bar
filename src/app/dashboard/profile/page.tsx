@@ -12,11 +12,10 @@ import { Camera, Trophy, Edit, Mail, MapPin, Calendar, Github, Linkedin, Twitter
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { PostCard } from '@/components/post-card'
 import UserInfoCard from '@/components/profile/InfoCard'
 import { IUser } from '@/types'
 import { useUserContext } from '@/context/AuthContext'
-import { genderToString } from '@/lib/utils'
+import { genderToString, getRoleTranslation } from '@/lib/utils'
 import { DatePicker } from '@/components/DatePicker'
 import { Textarea } from '@/components/ui/textarea'
 import ProfileHeader from '@/components/profile/ProfileHeader'
@@ -25,6 +24,7 @@ import FollowersModal from '@/components/profile/FollowerModal'
 import FollowingModal from '@/components/profile/FollowingModal'
 import ChangePasswordForm from '@/components/profile/ChangePasswordForm'
 import AchievementsCard from '@/components/profile/AchievementsCard'
+import { PostCard } from '@/components/post-related/post-card'
 
 export default function ProfileLayout() {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
@@ -53,9 +53,9 @@ export default function ProfileLayout() {
         <CardContent className="pt-24">
         <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-4">
   <div className="flex-1 min-w-0">
-    <h1 className="text-3xl font-bold break-all">{user.username}dawdwaadw</h1>
+    <h1 className="text-3xl font-bold break-all">{user.username}</h1>
     {/* <p className="text-xl text-muted-foreground">{userInfo.username}</p> */}
-    <Badge className="mt-2">Khách hàng</Badge>
+    <Badge className="mt-2">{getRoleTranslation(user.role)}</Badge>
   </div>
   <div className="mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto">
     <Dialog>
@@ -104,12 +104,12 @@ export default function ProfileLayout() {
             <FollowersModal
               showFollowersModal={showFollowersModal}
               setShowFollowersModal={setShowFollowersModal}
-              followers={user.followers}
+              followers={[]}
             />
             <FollowingModal
               showFollowingModal={showFollowingModal}
               setShowFollowingModal={setShowFollowingModal}
-              following={user.following}
+              following={[]}
        // Ensure it takes available space
             />
           </div>
