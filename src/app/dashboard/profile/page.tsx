@@ -157,9 +157,10 @@ export default function ProfileLayout() {
           <div>
             <h2 className="text-2xl font-bold mb-4">Posts</h2>
             <div className="space-y-4">
+{/* 
               {[1, 2, 3, 4, 5].map((post) => (
                 <PostCard key={post} />
-              ))}
+              ))}*/}
             </div>
           </div>
         </CardContent>
