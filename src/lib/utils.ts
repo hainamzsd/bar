@@ -5,29 +5,36 @@ import { useUserContext } from "@/context/AuthContext";
 import { toast, useToast } from "@/hooks/use-toast";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
-}
-export function formatTimeDifference(createdAt: string): string {
+}export function formatTimeDifference(createdAt: string): string {
   const now = new Date();
   const createdDate = new Date(createdAt);
   const timeDiff = now.getTime() - createdDate.getTime();
-  
+
   // Convert milliseconds to seconds
   const seconds = Math.floor(timeDiff / 1000);
-  
-  // Convert seconds to minutes
+
+  // Convert to higher units
   const minutes = Math.floor(seconds / 60);
-  
-  // Convert minutes to hours
   const hours = Math.floor(minutes / 60);
-  
-  if (hours > 0) {
-    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const years = Math.floor(days / 365);
+
+  if (years > 0) {
+    return `${years} năm trước`;
+  } else if (weeks > 0) {
+    return `${weeks} tuần trước`;
+  } else if (days > 0) {
+    return `${days} ngày trước`;
+  } else if (hours > 0) {
+    return `${hours} tiếng trước`;
   } else if (minutes > 0) {
-    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    return `${minutes} phút trước`;
   } else {
-    return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+    return `${seconds} giây trước`;
   }
 }
+
 export const genderToString = (gender: boolean | undefined) => {
   if (gender === true) return "Nam";
   if (gender === false) return "Nữ";

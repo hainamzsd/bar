@@ -23,14 +23,17 @@ export type INavLink = {
     iconUrl: string;        // URL to the achievement's icon
   };
   export type IComment = {
-    id: string;           // Unique ID for the post (assuming it's part of the relationship with post)
     content: string;          // Content of the post
     mediaUrl?: string;        // URL for media (optional if not every post has media)
     mentions?: string[];       // Array of user IDs who are mentioned in the post
+    post?: string;
+    creator: string;
+    parentId?: string;
+    level: number;
   };
 
   export type ICTFQuestion = {
-    id: string;               // Unique ID for the question
+    questionId: string;               // Unique ID for the question
     questionText: string;      // The question text
     difficulty: 'easy' | 'medium' | 'hard';  // Difficulty level as an enum
     hint?: string[];            // Array of hints for the question
@@ -43,7 +46,7 @@ export type INavLink = {
   };
 
   export type INotification = {
-    id: string;                 // Unique ID for the notification
+    notifyId: string;                 // Unique ID for the notification
     relatedId: string;          // ID related to the notification (e.g., post, comment, etc.)
     content: string;            // Notification content
     // userId: string;             // ID of the user who is notified (relationship with user)
@@ -52,7 +55,6 @@ export type INavLink = {
   };
 
   export type IPost = {
-    id: string;                 // Unique ID for the post
     creator: string;          // ID of the post creator (relationship with creator)
     caption: string;            // Caption of the post
     tags?: string[];             // Array of tags associated with the post
@@ -74,7 +76,7 @@ export type INavLink = {
   };
 
   export type IUser = {
-    id: string;
+    accountId: string;
     username: string;
     email: string;
     bio?: string;

@@ -13,7 +13,7 @@ export async function createUserAccount(user: INewUser){
         if(!newAccount) throw Error;
         const avatarUrl = avatars.getInitials(user.username);
         const newUser = await saveUserToDB({
-            id: newAccount.$id,
+            accountId: newAccount.$id,
             email: newAccount.email,
             username: user.username,
             imageUrl: String(avatarUrl),
@@ -36,7 +36,7 @@ export async function saveUserToDB(user: IUser) {
         const existingUser = await databases.listDocuments(
             appwriteConfig.databaseId as any,
             appwriteConfig.userCollectionId as any,
-            [Query.equal("id", user.id)]
+            [Query.equal("accountId", user.accountId)]
         );
 
         if (existingUser.total > 0) {
@@ -90,11 +90,12 @@ export async function signInFacebook() {
 export async function getCurrentUser(){
     try{
         const currentAccount = await account.get();
+        console.log(currentAccount);
         if(!currentAccount) throw Error;
         const currentUser = await databases.listDocuments(
             appwriteConfig.databaseId as any,
             appwriteConfig.userCollectionId as any,
-            [Query.equal('id', currentAccount.$id)]
+            [Query.equal('accountId', currentAccount.$id)]
         )
         if(!currentUser) throw Error;
         return currentUser.documents[0];

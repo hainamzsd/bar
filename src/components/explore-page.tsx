@@ -51,8 +51,8 @@ const ExplorePage = () => {
           :
           <>
            {posts?.map((post) => (
-            <PostCard key={post.id}
-            post={post as PostFromAPI}
+            <PostCard key={post.$id}
+            post={post as any}
             />
           ))}</>
           }

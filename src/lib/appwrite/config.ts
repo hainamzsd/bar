@@ -7,7 +7,8 @@ export const appwriteConfig = {
     storageId: process.env.NEXT_PUBLIC_APPWRITE_STORAGE,
     userCollectionId: process.env.NEXT_PUBLIC_APPWRITE_USERS_ID,
     postCollectionId: process.env.NEXT_PUBLIC_APPWRITE_POSTS_ID,
-    saveCollectionId: process.env.NEXT_PUBLIC_APPWRITE_SAVEPOSTS_ID
+    saveCollectionId: process.env.NEXT_PUBLIC_APPWRITE_SAVEPOSTS_ID,
+    commentCollectionId: process.env.NEXT_PUBLIC_APPWRITE_COMMENTS_ID
 }
 
 

@@ -86,7 +86,7 @@ const TopBar = () => {
                   </Badge>
                 </Button>
               </DropdownMenuTrigger>
-              <NotificationContent notifications={[
+              {/* <NotificationContent notifications={[
                 {
                   id: '1',
                   avatarUrl: 'https://github.com/shadcn.png',
@@ -95,7 +95,7 @@ const TopBar = () => {
                   time: '2 hours ago',
                 },
                 // Add more notifications here
-              ]} />
+              ]} /> */}
             </DropdownMenu>
 
             <DropdownMenu modal={false}>

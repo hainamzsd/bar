@@ -2,7 +2,6 @@
 export type PostFromAPI = {
     $collectionId: string;
     $createdAt: string; // ISO string format
-    $databaseId: string;
     $id: string; // The unique ID of the document
     $permissions: string[];
     $updatedAt: string; // ISO string format
@@ -10,13 +9,11 @@ export type PostFromAPI = {
     content: string;
     creator: {
       username: string;
-      id: string;
       email: string;
       bio: string | null;
       imageUrl: string;
       // Add other fields as needed
     };
-    id: string; // Duplicate of $id, if needed
     imageId: string;
     imageUrl: string;
     mentions: string[];

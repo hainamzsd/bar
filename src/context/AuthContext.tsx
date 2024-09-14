@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export const INITAL_USER: IUser = {
-    id: '',
+    accountId: '',
     username: '',
     email: '',
     imageUrl: '',
@@ -45,7 +45,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.log(currentAccount)
             if (currentAccount) {
                 setUser({
-                    id: currentAccount.$id,
+                    accountId: currentAccount.$id,
                     username: currentAccount.username,
                     email: currentAccount.email,
                     imageUrl: currentAccount.imageUrl,

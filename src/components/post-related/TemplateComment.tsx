@@ -1,102 +1,98 @@
+'use client'
+
 import { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { XIcon, PaperclipIcon } from 'lucide-react'
+import { Textarea } from '@/components/ui/textarea'
+import { useCreateReply, useFetchReplies, useFetchTopLevelComments } from '@/lib/react-query/commentQueriesAndMutations'
+import { CommentFromAPI } from '@/types/comment'
+import { formatTimeDifference } from '@/lib/utils'
+import { addReply } from '@/lib/appwrite/comment-api'
+import CommentForm from './CommentForm'
+import { useUserContext } from '@/context/AuthContext'
+import { ID } from 'appwrite'
 
-interface Comment {
-  id: string
-  author: string
-  avatar: string
-  content: string
-  timestamp: string
-  likes: number
-  replies: Reply[]
-  image?: string
-}
 
-interface Reply {
-  id: string
-  author: string
-  avatar: string
-  content: string
-  timestamp: string
-  image?: string
-}
-
-const dummyComments: Comment[] = [
-  // Example comment structure
-  {
-    id: '1',
-    author: 'Jane Doe',
-    avatar: '/placeholder.svg?height=32&width=32',
-    content: 'This is a comment.',
-    timestamp: '2 hours ago',
-    likes: 15,
-    replies: [],
-    image: '/path/to/image.jpg'
-  }
-]
-
-function Comment({ comment }: { comment: Comment }) {
+function Comment({ comment }: { comment: CommentFromAPI }) {
   const [showReplies, setShowReplies] = useState(false)
+  const [showReplyForm, setShowReplyForm] = useState(false)
+  const { data: replies, isLoading, refetch } = useFetchReplies(comment.$id)
+  const { user } = useUserContext()
 
   return (
-    <div className="flex flex-col space-y-2">
-      <div className="flex items-start gap-2">
-        <Avatar className="w-8 h-8">
-          <AvatarImage src={comment.avatar} alt={`${comment.author}'s avatar`} />
-          <AvatarFallback>{comment.author[0]}</AvatarFallback>
-        </Avatar>
-        <div className="flex-grow">
-          <div className="flex justify-between">
-            <p className="font-semibold">{comment.author}</p>
-            <p className="text-xs text-muted-foreground">{comment.timestamp}</p>
-          </div>
-          <p className="mt-1">{comment.content}</p>
-          {comment.image && (
-            <img src={comment.image} alt="Comment image" className="mt-2 rounded-md max-w-full h-auto" />
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowReplies(!showReplies)}
-            className="mt-2"
-          >
-            {showReplies ? 'Hide replies' : `View ${comment.replies.length} replies`}
-          </Button>
-          {showReplies && (
-            <div className="ml-8 mt-2 space-y-2">
-              {comment.replies.map((reply) => (
-                <div key={reply.id} className="flex items-start gap-2">
-                  <Avatar className="w-6 h-6">
-                    <AvatarImage src={reply.avatar} alt={`${reply.author}'s avatar`} />
-                    <AvatarFallback>{reply.author[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-grow">
-                    <div className="flex justify-between">
-                      <p className="font-semibold text-sm">{reply.author}</p>
-                      <p className="text-xs text-muted-foreground">{reply.timestamp}</p>
-                    </div>
-                    <p className="mt-1">{reply.content}</p>
-                    {reply.image && (
-                      <img src={reply.image} alt="Reply image" className="mt-2 rounded-md max-w-full h-auto" />
-                    )}
-                  </div>
-                </div>
-              ))}
+    <div className="w-full bg-card text-card-foreground rounded-lg shadow-sm">
+      <div className="p-4 space-y-4">
+        <div className="flex items-start gap-4">
+          <Avatar className="w-10 h-10">
+            <AvatarImage src={comment.creator.imageUrl} alt={comment.creator.username} />
+            <AvatarFallback>{comment.creator.username.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 ">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">{comment.creator.username}</h3>
             </div>
+            <p className="text-sm">{comment.content}</p>
+            <span className="text-sm text-muted-foreground">{formatTimeDifference(comment.$createdAt)}</span>
+            {comment.mediaUrl && (
+              <img src={comment.mediaUrl} alt="Comment media" className="mt-2 rounded-md max-w-full h-auto" />
+            )}
+            <div className="flex space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowReplyForm(!showReplyForm)}
+              >
+                Reply
+              </Button>
+              {replies && replies.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowReplies(!showReplies)}
+                >
+                  {showReplies ? 'Hide replies' : `View ${replies.length} ${replies.length === 1 ? 'reply' : 'replies'}`}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+        {showReplyForm && (
+          <div className="mt-2">
+            <CommentForm parentId={comment.$id} user={user} postId={'daw'}
+              formId={ID.unique()}/>
+          </div>
+        )}
+      </div>
+      
+      {showReplies && (
+        <div className="ml-12 space-y-4 p-4 bg-muted rounded-b-lg">
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading replies...</p>
+          ) : (
+            replies?.map((reply) => (
+              <Comment key={reply.$id} comment={reply as any} />
+            ))
           )}
         </div>
-      </div>
+      )}
     </div>
   )
 }
+export default function CommentList({ postId }: {postId: string}) {
+  const { data: comments, isLoading } = useFetchTopLevelComments(postId)
 
-export default function CommentList() {
+  if (isLoading) {
+    return <div className="text-center">Loading comments...</div>
+  }
+
+  if (!comments || comments.length === 0) {
+    return <div className="text-center">No comments yet.</div>
+  }
+
   return (
-    <div className="space-y-4">
-      {dummyComments.map((comment) => (
-        <Comment key={comment.id} comment={comment} />
+    <div className="space-y-6 w-full">
+      {comments.map((comment) => (
+        <Comment key={comment.$id} comment={comment as any} />
       ))}
     </div>
   )

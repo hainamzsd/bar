@@ -24,19 +24,21 @@ export default function Loading() {
                 `https://graph.facebook.com/me?fields=id,name,picture.width(200).height(200)&access_token=${providerAccessToken}`
             ).then((res) => res.json());
             let avatarUrl = facebookUserInfo.picture?.data?.url || "";
-
-            const existingUser = await databases.listDocuments(
-                appwriteConfig.databaseId as any,
-                appwriteConfig.userCollectionId as any,
-                [Query.equal("id", currentAccount.$id)]
-            );
+            if (!currentAccount.$id) {
+              throw new Error("Account ID is missing or undefined.");
+          }
+          const existingUser = await databases.listDocuments(
+            appwriteConfig.databaseId as string,
+            appwriteConfig.userCollectionId as string,
+            [Query.equal("email", currentAccount.email)]  // Ensure accountId has a valid value
+        );
 
             if (existingUser.total === 0) {
                 if (!avatarUrl) {
                     avatarUrl = avatars.getInitials(currentAccount.name || currentAccount.email);
                 }
                 await saveUserToDB({
-                    id: currentAccount.$id,
+                    accountId: currentAccount.$id,
                     email: currentAccount.email,
                     username: currentAccount.name || currentAccount.email.split("@")[0],
                     imageUrl: avatarUrl,
@@ -46,7 +48,7 @@ export default function Loading() {
                 });
             }
 
-            router.replace("/home");
+            router.replace("/dashboard/explore");
         } catch (error) {
             console.log("Error during post-login handling:", error);
             router.replace("/");

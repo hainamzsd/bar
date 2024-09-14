@@ -65,7 +65,7 @@ export default function Menu() {
               <Bell className={`h-[1.2rem] w-[1.2rem] `} />
             </Button>
           </DropdownMenuTrigger>
-        <NotificationContent   notifications={[
+        {/* <NotificationContent   notifications={[
     {
       id: '1',
       avatarUrl: 'https://github.com/shadcn.png',
@@ -74,7 +74,7 @@ export default function Menu() {
       time: '2 hours ago',
     },
     // Add more notifications here
-  ]}></NotificationContent>
+  ]}></NotificationContent> */}
         </DropdownMenu>
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger className={`flex justify-center items-center p-2

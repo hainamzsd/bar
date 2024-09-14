@@ -31,6 +31,7 @@ import { extractHashtagsAndCleanContent } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { PuffLoader } from "react-spinners";
+import LoadingButton from "../ui/loading-button";
 
 // Define the Zod schema for validation
 const postSchema = z.object({
@@ -91,11 +92,11 @@ export function CreatePost() {
     try{
       const post = await createPostMutation.mutateAsync({
         post: {
-          id: ID.unique(),
-          creator: user.id,
+          creator: user.accountId,
           caption: values.caption,
           content: tags.content,
-          tags: tags.tags
+          tags: tags.tags,
+          
         },
         mediaFile: mediaFile || undefined 
       });
@@ -111,7 +112,7 @@ export function CreatePost() {
       router.refresh();
     }catch(error:any){
       toast({
-        title:`${error.msg}`,
+        title:`${error}`,
         variant:'destructive'
       })
     }
@@ -211,20 +212,12 @@ export function CreatePost() {
             </div>
           </CardContent>
           <CardFooter>
-          <Button
-              type="submit"
-              className="w-full"
-              disabled={createPostMutation.isPending} // Disable button when loading
-            >
-              {createPostMutation.isPending ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <PuffLoader color="hsl(var(--secondary))" size={20} /> {/* Smaller spinner */}
-                  <span>Đang đăng...</span>
-                </div>
-              ) : (
-                "Đăng bài viết"
-              )}
-            </Button>
+          <LoadingButton
+        isLoading={createPostMutation.isPending}
+        content="Đăng bài viết"
+        loadingText="Đang đăng..." // Custom loading text
+        disabled={createPostMutation.isPending} // Optional: pass if you want to control disabled state
+      />
           </CardFooter>
         </form>
       </Form>
