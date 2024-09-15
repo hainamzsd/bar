@@ -1,4 +1,4 @@
-import {Client, Account, Databases, Storage, Avatars, ID, OAuthProvider} from 'appwrite';
+import {Client, Account, Databases, Storage, Avatars, ID, OAuthProvider, RealtimeResponseEvent } from 'appwrite';
 
 export const appwriteConfig = {
     projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID,
@@ -25,6 +25,4 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 export const avatars = new Avatars(client);
-
-
 

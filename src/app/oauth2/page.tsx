@@ -50,7 +50,7 @@ export default function Loading() {
 
             router.replace("/dashboard/explore");
         } catch (error) {
-            console.log("Error during post-login handling:", error);
+            
             router.replace("/");
         }
     }

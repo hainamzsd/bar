@@ -1,79 +1,67 @@
-'use client'
-
-import React, { useState, useRef } from 'react'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { XIcon, PaperclipIcon, SmileIcon, SendIcon } from 'lucide-react'
+import React, { useState, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useToast } from '@/hooks/use-toast';
 import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
 import vi from '@emoji-mart/data/i18n/vi.json'
-import { IUser } from '@/types'
-import * as z from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-} from '@/components/ui/form'
-import { useCreateComment } from '@/lib/react-query/commentQueriesAndMutations'
-import { useToast } from '@/hooks/use-toast'
-import { PuffLoader } from 'react-spinners'
-
-const commentFormSchema = z.object({
-  content: z.string().optional(),
-})
-
-type CommentFormValues = z.infer<typeof commentFormSchema>
-
-interface CommentFormProps {
-  user: IUser;
-  parentId?: string | null;
-  formId: string;
+import { useCreateReply } from '@/lib/react-query/commentQueriesAndMutations';
+import { IUser } from '@/types';
+import { CommentFromAPI } from '@/types/comment';
+import { Form, FormControl, FormField, FormItem } from '../ui/form';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Textarea } from '../ui/textarea';
+import { Button } from '../ui/button';
+import { PaperclipIcon, SendIcon, SmileIcon, XIcon } from 'lucide-react';
+import Picker from '@emoji-mart/react'
+import { PuffLoader } from 'react-spinners';
+interface ReplyFormProps {
+    parentComment: CommentFromAPI, // Parent comment ID
+    user: IUser
   postId: string;
+  formId: string;
 }
-
-const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postId }) => {
-  const [commentImage, setCommentImage] = useState<File | null>(null)
+const commentFormSchema = z.object({
+    content: z.string().optional(),
+  })
+  
+  type CommentFormValues = z.infer<typeof commentFormSchema>
+const ReplyForm: React.FC<ReplyFormProps> = ({ parentComment, user,postId,formId}) => {
+  const [commentImage, setCommentImage] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-  const commentFileInputRef = useRef<HTMLInputElement | null>(null)
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const commentFileInputRef = useRef<HTMLInputElement | null>(null);
   const { toast } = useToast();
+
   const form = useForm<CommentFormValues>({
     resolver: zodResolver(commentFormSchema),
     defaultValues: {
       content: '',
     },
-  })
-  const createCommentMutation = useCreateComment();
+  });
+  const createReplyMutation = useCreateReply(); // Using the new hook
 
   async function onSubmit(values: CommentFormValues) {
     if (!values.content && !commentImage) {
       toast({
         title: "Vui lòng nhập nội dung hoặc đính kèm hình ảnh",
-        variant: 'destructive'
+        variant: 'destructive',
       });
       return;
     }
 
     try {
-      const comment = await createCommentMutation.mutateAsync({
-        comment: {
-          content: values.content || '',
-          post: postId,
-          creator: user.accountId,
-          parentId: parentId || undefined,
-          level: parentId ? 1 : 0,
-        },
-        mediaFile: commentImage || undefined,
+      const reply = await createReplyMutation.mutateAsync({
+        parentComment: parentComment,
+        content: values.content || '',
+        user: user,
+        mediaFile:commentImage || undefined
       });
 
-      if (!comment) {
+      if (!reply) {
         toast({
           title: `Có lỗi xảy ra vui lòng thử lại sau.`,
-          variant: 'destructive'
+          variant: 'destructive',
         });
       } else {
         form.reset();
@@ -81,43 +69,42 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
         setCommentImage(null);
       }
     } catch (error) {
-      console.log(error)
+      
       toast({
         title: `Có lỗi xảy ra`,
         description: `${error}`,
-        variant: 'destructive'
-      })
+        variant: 'destructive',
+      });
     }
   }
 
   const handleCommentImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
       setCommentImage(file);
       setMediaPreview(URL.createObjectURL(file));
     }
-  }
+  };
 
   const removeCommentImage = () => {
-    setCommentImage(null)
-    setMediaPreview(null)
+    setCommentImage(null);
+    setMediaPreview(null);
     if (commentFileInputRef.current) {
-      commentFileInputRef.current.value = ''
+      commentFileInputRef.current.value = '';
     }
-  }
+  };
+
+  const toggleEmojiPicker = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setShowEmojiPicker(!showEmojiPicker);
+  };
 
   const addEmoji = (emoji: any) => {
     form.setValue('content', (form.getValues('content') || '') + emoji.native, { shouldValidate: true })
     setShowEmojiPicker(false)
   }
-
-  const toggleEmojiPicker = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    setShowEmojiPicker(!showEmojiPicker)
-  }
-
   return (
-    <div className='w-full'>
+    <div className="max-w-lg ml-8"> {/* Indent the reply */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full items-start space-x-2">
           <Avatar className="rounded-full w-8 h-8">
@@ -133,7 +120,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
                 <FormItem>
                   <FormControl>
                     <Textarea
-                      placeholder="Add a comment..."
+                      placeholder="Reply to the comment..."
                       className="min-h-[60px]"
                       {...field}
                     />
@@ -168,13 +155,12 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="cursor-pointer"
                   asChild
                 >
-                  <label htmlFor={`comment-file-${formId}`}>
+                  <label htmlFor={`reply-file-${formId}`}>
                     <PaperclipIcon className="h-5 w-5 text-muted-foreground" />
                     <input
-                      id={`comment-file-${formId}`}
+                      id={`reply-file-${formId}`}
                       type="file"
                       accept="image/*"
                       className="hidden"
@@ -198,19 +184,20 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
               <Button
                 type="submit"
                 size={'icon'}
-                disabled={createCommentMutation.isPending || (!form.getValues('content') && !commentImage)}
+                disabled={createReplyMutation.isPending || (!form.getValues('content') && !commentImage)}
               >
-                {createCommentMutation.isPending ? (
+                {createReplyMutation.isPending ? (
                   <div className="flex items-center justify-center space-x-2">
-                    <PuffLoader color="hsl(var(--secondary))" size={20} />
-                  </div>
-                ) : (
-                  <>
-                    <SendIcon className="h-4 w-4" />
-                    <span className="sr-only">gửi</span>
-                  </>
+                  <PuffLoader color="hsl(var(--secondary))" size={20} />
+                </div>
+              ) : (
+                <>
+                  <SendIcon className="h-4 w-4" />
+                  <span className="sr-only">gửi</span>
+                </>
                 )}
               </Button>
+            
             </div>
 
             {showEmojiPicker && (
@@ -222,7 +209,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
         </form>
       </Form>
     </div>
-  )
-}
+  );
+};
 
-export default CommentForm
+export default ReplyForm;

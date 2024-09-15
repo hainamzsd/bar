@@ -131,7 +131,7 @@ export async function deleteFile(fileId: string) {
 
     return { status: "ok" };
   } catch (error) {
-    console.log(error);
+    
     throw error;
   }
 }

@@ -48,7 +48,7 @@ export const stringToGender = (value: string): boolean | undefined => {
 };
 
 export function formatDate(dateString: any): string {
-  console.log(dateString);
+  
 
   if (!dateString) return "N/A"; // Handle missing or empty date values
   const date = new Date(dateString);

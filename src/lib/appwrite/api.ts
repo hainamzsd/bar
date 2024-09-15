@@ -17,7 +17,7 @@ export async function createUserAccount(user: INewUser){
             email: newAccount.email,
             username: user.username,
             imageUrl: String(avatarUrl),
-            joinDate: new Date().toLocaleDateString("vi-VN"),
+            joinDate:new Date().toISOString(),
             isActive: true,
             role: 'customer'
         })
@@ -41,7 +41,7 @@ export async function saveUserToDB(user: IUser) {
 
         if (existingUser.total > 0) {
             // If the user already exists, do not create a new one
-            console.log("User already exists in the database.");
+            
             return existingUser.documents[0];
         }
 
@@ -69,7 +69,7 @@ export async function signInAccount(user: {
         const session = await account.createEmailPasswordSession(user.email, user.password);
         return session;
     } catch (error: any) {
-        console.log("Error during sign-in:", error);
+        
         // Re-throw the error to pass it up to the caller
         throw error; 
     }
@@ -84,13 +84,13 @@ export async function signInFacebook() {
         );
         return session;
     } catch (error) {
-        console.log("Error during Facebook sign-in:", error);
+        
     }
 }
 export async function getCurrentUser(){
     try{
         const currentAccount = await account.get();
-        console.log(currentAccount);
+        
         if(!currentAccount) throw Error;
         const currentUser = await databases.listDocuments(
             appwriteConfig.databaseId as any,
@@ -107,7 +107,7 @@ export async function getCurrentUser(){
 export async function signOutAccount() {
     try {
         const session = await account.deleteSession("current");
-        console.log("Successfully logged out:", session);
+        
         return session;
     } catch (error) {
         console.error("Error during logout:", error);

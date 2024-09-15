@@ -15,7 +15,7 @@ export const useCreatePost = () => {
     mutationFn: ({ post, mediaFile }: { post: IPost, mediaFile?: File }) => createPost(post, mediaFile),
     onSuccess: () => {
         // Optionally, invalidate queries or handle success UI
-        console.log("Post created successfully");
+        
       },
       onError: (error) => {
         console.error("Error creating post", error);

@@ -1,4 +1,5 @@
-import { IComment } from ".";
+import { IComment, IPost } from ".";
+import { PostFromAPI } from "./post";
 
     export type CommentFromAPI = {
         $collectionId: string;
@@ -9,7 +10,7 @@ import { IComment } from ".";
         content: string;          // Content of the post
         mediaUrl?: string;        // URL for media (optional if not every post has media)
         mentions?: string[];       // Array of user IDs who are mentioned in the post
-        post?: string;
+        post?: PostFromAPI;
         creator: {
             username: string;
             id: string;
