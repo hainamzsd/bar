@@ -60,6 +60,24 @@ export async function saveUserToDB(user: IUser) {
     }
 }
 
+export async function searchUserByUsername(username: string) {
+    try {
+        const users = await databases.listDocuments(
+            appwriteConfig.databaseId as any,
+            appwriteConfig.userCollectionId as any,
+            [Query.search('username', username)]
+        );
+
+        if (users.total === 0) {
+            throw new Error(`No users found with the username: ${username}`);
+        }
+
+        return users;
+    } catch (error) {
+        console.error("Error searching for users:", error);
+        throw error;
+    }
+}
 
 export async function signInAccount(user: {
     email: string;

@@ -1,5 +1,5 @@
 import {
-  Home, Expand, UsersRound, Bookmark, icons, LayoutList, ImagePlus,
+  Home, Expand, UsersRound, Bookmark, icons, LayoutList, ImagePlus, Newspaper,
   Coffee, Scale, CircleHelp, Rabbit, Images
 } from 'lucide-react'
 
@@ -11,8 +11,13 @@ export const mainNavigate = [
   },
   {
     route: "/dashboard/explore",
-    label: "Bảng tin",
+    label: "Bảng tin quán bar",
     icon: LayoutList
+  },
+  {
+    route: "/dashboard/anime-list",
+    label: "Bảng tin anime",
+    icon: Newspaper
   },
   {
     route: "/dashboard/people",

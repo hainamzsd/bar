@@ -3,22 +3,23 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState, useEffect } from 'react'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import { useSignOutAccount } from '@/lib/react-query/queriesAndMutations'
 import { useRouter } from 'next/navigation'
 import { useUserContext } from '@/context/AuthContext'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
-import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '../ui/dropdown-menu'
+import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { Bell, LogOut, Menu, Moon, Search, User, X } from 'lucide-react'
-import { Badge } from '../ui/badge'
-import { Switch } from '../ui/switch'
+import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
 import { useTheme } from 'next-themes'
-import { Input } from '../ui/input'
+import { Input } from '@/components/ui/input'
 import LeftSideBar from './LeftSideBar'
-import NotificationContent from '../notifications-content'
-import SearchComponent from '../ExploreSearch'
 import { getRoleTranslation } from '@/lib/utils'
+import NotificationContent from '../notifications-content'
+import SearchComponent from '../searchs/ExploreSearch'
+import DesktopSearchComponent from '../searchs/SearchExploreDesktop'
 
 const TopBar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -46,10 +47,12 @@ const TopBar = () => {
     };
   }, [isSearchOpen]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
     // Implement search functionality here
-    
+    console.log("Searching for:", query);
+    // You can add your search logic here, such as navigating to a search results page
+    router.push(`/search?q=${encodeURIComponent(query)}`);
     setIsSearchOpen(false);
   };
 
@@ -66,13 +69,8 @@ const TopBar = () => {
             </Link>
           </div>
 
-          <div className='hidden md:flex items-center flex-1 max-w-xl mx-4'>
-            <div className='relative w-full'>
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <Input type="text" placeholder="Search..." className="pl-10 w-full" />
-            </div>
-          </div>
 
+          <DesktopSearchComponent isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onSearch={handleSearch} ></DesktopSearchComponent>
           <div className='flex items-center gap-4'>
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSearchOpen(true)}>
               <Search />
@@ -150,18 +148,16 @@ const TopBar = () => {
       </section>
 
       {/* Mobile menu overlay */}
-      <div 
-        className={`fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-300 z-40 md:hidden ${
-          isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+      <div
+        className={`fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-300 z-40 md:hidden ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
         onClick={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Mobile menu */}
-      <div 
-        className={`fixed inset-y-0 left-0 z-50 w-[calc(100%-3rem)] max-w-sm bg-background shadow-lg transition-transform duration-300 ease-in-out transform md:hidden ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-[calc(100%-3rem)] max-w-sm bg-background shadow-lg transition-transform duration-300 ease-in-out transform md:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-lg font-semibold">Menu</h2>
@@ -175,7 +171,7 @@ const TopBar = () => {
       </div>
 
       {/* Mobile search overlay */}
-      <SearchComponent isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)}  />
+      <SearchComponent isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onSearch={handleSearch} />
     </>
   )
 }

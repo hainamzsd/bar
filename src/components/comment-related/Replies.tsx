@@ -3,11 +3,13 @@ import { CommentFromAPI } from '@/types/comment'
 import Comment from './Comments'
 
 function ReplyList({
+  
   replies,
   isLoading,
   hasNextPage,
   fetchNextPage,
 }: {
+  postId: string; 
   replies: CommentFromAPI[]
   isLoading: boolean
   hasNextPage: boolean | undefined

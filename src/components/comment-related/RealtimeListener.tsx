@@ -4,7 +4,13 @@ import { useEffect, useRef, useState } from 'react'
 import { client, databases, appwriteConfig } from '@/lib/appwrite/config'
 import { CommentFromAPI } from '@/types/comment'
 
-function RealtimeListener({ postId, setComments }: { postId: string; setComments: (comments: CommentFromAPI[]) => void }) {
+function RealtimeListener({
+  postId,
+  setComments
+}: {
+  postId: string;
+  setComments: (comments: any) => void;
+}) {
   const hasSubscribedRef = useRef(false)
   const pendingUpdatesRef = useRef<string[]>([])
   const [isUpdating, setIsUpdating] = useState(false)
@@ -51,7 +57,7 @@ function RealtimeListener({ postId, setComments }: { postId: string; setComments
           ) 
 
           if (fullComment.post.$id === postId && !fullComment.parentId) {
-            newComments.push(fullComment)
+            newComments.push(fullComment as any) // Use the correct type
           }
         } catch (error) {
           console.error("Error fetching full comment:", error)
@@ -61,7 +67,7 @@ function RealtimeListener({ postId, setComments }: { postId: string; setComments
     }
 
     if (newComments.length > 0) {
-      setComments(prevComments => [...newComments, ...prevComments])
+      setComments((prevComments: any) => [...newComments, ...prevComments])
     }
 
     setIsUpdating(false)

@@ -4,7 +4,7 @@ import {
     useQueryClient,
     useInfiniteQuery
 } from '@tanstack/react-query'
-import { createUserAccount, signInAccount, signInFacebook, signOutAccount } from '../appwrite/api'
+import { createUserAccount, searchUserByUsername, signInAccount, signInFacebook, signOutAccount } from '../appwrite/api'
 import { INewUser } from '@/types'
 
 export const useCreateUserAccount = () => {
@@ -19,6 +19,14 @@ export const useSignInAccount = () => {
             password:string}) => signInAccount(user)
     })
 }
+
+export const useSearchUserByUsername = (username: string) => {
+    return useQuery({
+      queryKey: ['searchUser', username],
+      queryFn: () => searchUserByUsername(username),
+      enabled: !!username,  // Only run if a username is provided
+    });
+  };
 
 export const useSignOutAccount = () => {
     return useMutation({

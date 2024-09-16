@@ -31,6 +31,7 @@ export function PostCard({ post }: PostCardProps) {
         avatar={post.creator.imageUrl}
       />
       <PostContent
+      id={post.$id}
         content={post.content}
         title={post.caption}
         imageUrl={post.imageUrl}

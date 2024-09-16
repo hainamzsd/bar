@@ -10,7 +10,7 @@ import { PostFromAPI } from "./post";
         content: string;          // Content of the post
         mediaUrl?: string;        // URL for media (optional if not every post has media)
         mentions?: string[];       // Array of user IDs who are mentioned in the post
-        post?: PostFromAPI;
+        post: PostFromAPI;
         creator: {
             username: string;
             id: string;

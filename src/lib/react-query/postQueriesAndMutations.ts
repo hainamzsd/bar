@@ -6,7 +6,8 @@ import {
   deletePost, 
   getPostById, 
   getAllPosts, 
-  uploadMedia 
+  uploadMedia, 
+  searchPostsByTitle
 } from '../appwrite/post-api';
 
 // Hook to create a post
@@ -20,6 +21,14 @@ export const useCreatePost = () => {
       onError: (error) => {
         console.error("Error creating post", error);
       },
+  });
+};
+
+export const useSearchPostsByTitle = (title: string) => {
+  return useQuery({
+    queryKey: ['searchPosts', title], // Unique query key based on the search term
+    queryFn: () => searchPostsByTitle(title),
+    enabled: !!title, // Only run the query if the title is not empty
   });
 };
 

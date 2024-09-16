@@ -2,18 +2,20 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { HeartIcon, MessageCircleIcon, SendIcon, BookmarkIcon, XIcon } from 'lucide-react'
+import { HeartIcon, MessageCircleIcon, SendIcon, BookmarkIcon, XIcon, ExternalLinkIcon } from 'lucide-react'
 import { CardContent } from '@/components/ui/card'
 import { highlightHashtags } from '@/lib/utils'
+import Link from 'next/link'
 
 type PostProps = {
+  id: string;
   title: string;
   imageUrl?: string;
   content?: string;
   tags?: string[];
 };
 
-export default function PostContent({ title, imageUrl, content, tags }: PostProps) {
+export default function PostContent({ id, title, imageUrl, content, tags }: PostProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   const toggleFullscreen = () => setIsFullscreen(!isFullscreen)
@@ -21,7 +23,12 @@ export default function PostContent({ title, imageUrl, content, tags }: PostProp
   return (
     <>
       <CardContent className="space-y-4">
-        <h2 className="text-xl font-bold">{title}</h2>
+        <Link href={`/dashboard/post/${id}`} className="group">
+          <h2 className="text-xl font-bold flex items-center gap-2 hover:text-blue-500 transition-colors">
+            {title}
+            <ExternalLinkIcon className="h-4 w-4  transition-opacity" />
+          </h2>
+        </Link>
         {imageUrl && (
           <div className="relative">
             <img

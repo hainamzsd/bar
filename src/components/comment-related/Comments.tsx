@@ -36,22 +36,25 @@ function Comment({ comment, isReply = false }: { comment: CommentFromAPI; isRepl
   const totalReplies = replies.length
 
   return (
-    <div className={`w-full bg-card text-card-foreground rounded-lg shadow-sm ${isReply ? 'ml-8 mt-2' : ''}`}>
-      <div className="p-4 space-y-4">
+    <div className={`w-full bg-card text-card-foreground rounded-lg ${isReply ? 'ml-8 mt-2' : ''}`}>
+      <div className="">
         <div className="flex items-start gap-3">
           <Avatar className="w-8 h-8">
             <AvatarImage src={comment.creator.imageUrl} alt={comment.creator.username} />
             <AvatarFallback>{comment.creator.username.charAt(0)}</AvatarFallback>
           </Avatar>
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-0">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-sm">{comment.creator.username}</h3>
-              <span className="text-xs text-muted-foreground">{formatTimeDifference(comment.$createdAt)}</span>
             </div>
+            {comment.content && 
             <p className="text-sm">{comment.content}</p>
+            }
             {comment.mediaUrl && (
               <img src={comment.mediaUrl} alt="Comment media" className="mt-2 rounded-md max-w-full h-auto max-h-60 object-cover" />
             )}
+            <span className="text-xs text-muted-foreground">{formatTimeDifference(comment.$createdAt)}</span>
+
             {!isReply && (
               <div className="flex space-x-2 mt-2">
                 <Button variant="ghost" size="sm" onClick={() => setShowReplyForm(!showReplyForm)}>
@@ -67,7 +70,7 @@ function Comment({ comment, isReply = false }: { comment: CommentFromAPI; isRepl
           </div>
         </div>
         {!isReply && showReplyForm && (
-          <ReplyForm user={user} parentComment={comment} postId={comment.post?.$id} formId={ID.unique()} />
+          <ReplyForm user={user} parentComment={comment} postId={comment.post.$id} formId={ID.unique()} />
         )}
       </div>
       {!isReply && showReplies && (
