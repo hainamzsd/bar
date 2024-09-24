@@ -20,6 +20,21 @@ export const useSignInAccount = () => {
     })
 }
 
+export const useMentionSuggestions = (mentionQuery: string, showSuggestions: boolean) => {
+  return useInfiniteQuery({
+    queryKey: ['mentionSuggestions', mentionQuery],
+    queryFn: ({ pageParam = 0 }) =>
+      searchUserByUsername(mentionQuery).then(res => ({
+        users: res.documents,
+        nextCursor: pageParam + 5,
+      })),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: 0,
+    enabled: showSuggestions && mentionQuery.length > 0,
+    staleTime: 60000, // Cache results for 1 minute
+    refetchOnWindowFocus: false,
+  });
+};
 export const useSearchUserByUsername = (username: string) => {
     return useQuery({
       queryKey: ['searchUser', username],

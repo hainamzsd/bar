@@ -1,6 +1,7 @@
   import { ID, Query } from 'appwrite';
   import { databases, appwriteConfig, storage } from './config';
   import { IPost } from '@/types';
+import { extractMentions } from '../utils';
 
   // Function to create a new post
   export async function createPost(post: IPost, mediaFile?: File) {
@@ -33,6 +34,8 @@
         await deleteFile(uploadedFile.$id);
         throw Error;
       }
+
+      await createMentions(newPost.$id, post.content ?? '', post.creator);
       return newPost;
     } catch (error) {
       console.error("Error creating post:", error);
@@ -40,6 +43,41 @@
     }
   }
 
+  async function createMentions(postId: string, content: string, mentioningUserId: string) {
+    const mentionedUsernames = extractMentions(content);
+    for (const username of mentionedUsernames) {
+      try {
+        // Find the mentioned user
+        const users = await databases.listDocuments(
+          appwriteConfig.databaseId as string,
+          appwriteConfig.userCollectionId as string,
+          [Query.equal('username', username)]
+        );
+        console.log(users)
+        if (users.documents.length > 0) {
+          const mentionedUser = users.documents[0];
+  
+          // Create a mention document
+          await databases.createDocument(
+            appwriteConfig.databaseId as string,
+            appwriteConfig.mentionCollectionId as string,
+            ID.unique(),
+            {
+              post: postId,
+              mentioningUser: mentioningUserId,
+              mentionedUser: mentionedUser.$id,
+              comment: content
+            }
+          );
+          console.log(`Mention created for user ${username}`);
+        } else {
+          console.warn(`User ${username} not found in the database`);
+        }
+      } catch (error) {
+        console.error(`Error creating mention for user ${username}:`, error);
+      }
+    }
+  }
   // Function to update an existing post
   export async function updatePost(postId: string, updatedData: Partial<IPost>, newMediaFile?: File){
     try {

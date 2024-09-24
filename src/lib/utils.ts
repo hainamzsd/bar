@@ -35,6 +35,12 @@ export function cn(...inputs: ClassValue[]) {
   }
 }
 
+export function extractMentions(content: string): string[] {
+  const mentionRegex = /@(\w+)/g;
+  const matches = content.match(mentionRegex);
+  return matches ? matches.map(match => match.slice(1)) : [];
+}
+
 export const genderToString = (gender: boolean | undefined) => {
   if (gender === true) return "Nam";
   if (gender === false) return "Nữ";
