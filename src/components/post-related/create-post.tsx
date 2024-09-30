@@ -204,23 +204,23 @@ export function CreatePost() {
                         className="w-full p-2 border rounded"
                       />
                       {showSuggestions && uniqueMentionSuggestions.length > 0 && (
-                        <ul className="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg max-h-60 overflow-y-auto">
-                          {uniqueMentionSuggestions.map((user, index) => (
-                            <li
-                              key={user.$id}
-                              ref={index === uniqueMentionSuggestions.length - 1 && hasNextPage ? lastUserElementRef : null}
-                              className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
-                              onClick={() => handleUserSelect(user.username)}
-                            >
-                              <Avatar className="w-8 h-8 mr-2">
-                                <AvatarImage src={user.imageUrl} alt={user.username} />
-                                <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
-                              </Avatar>
-                              {user.username}
-                            </li>
-                          ))}
-                          {isFetchingNextPage && <li className="p-2 text-center">Loading more...</li>}
-                        </ul>
+                        <ul className="absolute z-10 w-52 mt-1 border rounded shadow-lg max-h-60 overflow-y-auto bg-card text-card-foreground">
+                        {uniqueMentionSuggestions.map((user, index) => (
+                          <li
+                            key={user.$id}
+                            ref={index === uniqueMentionSuggestions.length - 1 && hasNextPage ? lastUserElementRef : null}
+                            className="p-2 cursor-pointer flex items-center hover:bg-muted"
+                            onClick={() => handleUserSelect(user.username)}
+                          >
+                            <Avatar className="w-8 h-8 mr-2">
+                              <AvatarImage src={user.imageUrl} alt={user.username} />
+                              <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            {user.username}
+                          </li>
+                        ))}
+                        {/* {isFetchingNextPage && <li className="p-2 text-center">Loading more...</li>} */}
+                      </ul>
                       )}
                     </div>
                   </FormControl>

@@ -4,8 +4,11 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { HeartIcon, MessageCircleIcon, SendIcon, BookmarkIcon, XIcon, ExternalLinkIcon } from 'lucide-react'
 import { CardContent } from '@/components/ui/card'
-import { highlightHashtags } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
+import { LikeButton } from '../LikeButton'
+import { useUserContext } from '@/context/AuthContext'
+import { useCommentCount } from '@/lib/react-query/commentQueriesAndMutations'
 
 type PostProps = {
   id: string;
@@ -14,19 +17,38 @@ type PostProps = {
   content?: string;
   tags?: string[];
 };
+const highlightHashtagsAndMentions = (content: string) => {
+  // Regular expressions for hashtags and mentions
+  const hashtagRegex = /#(\w+)/g;
+  const mentionRegex = /@(\w+)/g;
+
+  // Split content by spaces, keeping spaces intact
+  const parts = content.split(/(\s+)/).map((part, index) => {
+    if (hashtagRegex.test(part)) {
+      // Highlight hashtags with blue color
+      return <span key={index} className="text-blue-500 hover:underline cursor-pointer">{part}</span>;
+    } else if (mentionRegex.test(part)) {
+      // Highlight mentions using a Badge component
+      return <Badge key={index} variant="default" className="mr-1 text-sm">{part}</Badge>;
+    }
+    return part;
+  });
+
+  return <>{parts}</>;
+};
 
 export default function PostContent({ id, title, imageUrl, content, tags }: PostProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
-
+  const {user} = useUserContext();
   const toggleFullscreen = () => setIsFullscreen(!isFullscreen)
-
+  const {data,isPending} = useCommentCount(id);
   return (
     <>
       <CardContent className="space-y-4">
         <Link href={`/dashboard/post/${id}`} className="group">
           <h2 className="text-xl font-bold flex items-center gap-2 hover:text-blue-500 transition-colors">
             {title}
-            <ExternalLinkIcon className="h-4 w-4  transition-opacity" />
+            <ExternalLinkIcon className="h-4 w-4 transition-opacity" />
           </h2>
         </Link>
         {imageUrl && (
@@ -39,15 +61,14 @@ export default function PostContent({ id, title, imageUrl, content, tags }: Post
             />
           </div>
         )}
-        <p className="text-sm" dangerouslySetInnerHTML={{ __html: highlightHashtags(content ?? '', tags ?? []) }} />
+        <p className="text-sm">
+          {highlightHashtagsAndMentions(content ?? '')}
+        </p>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="ghost" size="sm">
-            <HeartIcon className="h-4 w-4 mr-2" />
-            1.5k
-          </Button>
+        <LikeButton postId={id} userId={user.accountId} />
           <Button variant="ghost" size="sm">
             <MessageCircleIcon className="h-4 w-4 mr-2" />
-            234
+            {data}
           </Button>
           <Button variant="ghost" size="sm">
             <SendIcon className="h-4 w-4 mr-2" />

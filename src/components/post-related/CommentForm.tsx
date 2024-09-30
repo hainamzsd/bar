@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -21,6 +21,7 @@ import {
 import { useCreateComment } from '@/lib/react-query/commentQueriesAndMutations'
 import { useToast } from '@/hooks/use-toast'
 import { PuffLoader } from 'react-spinners'
+import { useMentionSuggestions } from '@/lib/react-query/queriesAndMutations'
 
 const commentFormSchema = z.object({
   content: z.string().optional(),
@@ -39,6 +40,8 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
   const [commentImage, setCommentImage] = useState<File | null>(null)
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const commentFileInputRef = useRef<HTMLInputElement | null>(null)
   const { toast } = useToast();
   const form = useForm<CommentFormValues>({
@@ -48,6 +51,65 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
     },
   })
   const createCommentMutation = useCreateComment();
+
+  const {
+    data: mentionSuggestionsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+  } = useMentionSuggestions(mentionQuery, showSuggestions);
+
+  const uniqueMentionSuggestions = useMemo(() => {
+    if (!mentionSuggestionsData) return [];
+    const uniqueUsers = new Map();
+    mentionSuggestionsData.pages.forEach(page => {
+      page.users.forEach(user => {
+        if (!uniqueUsers.has(user.$id)) {
+          uniqueUsers.set(user.$id, user);
+        }
+      });
+    });
+    return Array.from(uniqueUsers.values());
+  }, [mentionSuggestionsData]);
+
+  useEffect(() => {
+    if (showSuggestions) {
+      refetch();
+    }
+  }, [showSuggestions, refetch]);
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    form.setValue("content", value);
+    const lastWord = value.split(/\s/).pop() || "";
+    if (lastWord.startsWith('@') && lastWord.length > 1) {
+      setMentionQuery(lastWord.slice(1));
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleUserSelect = (username: string) => {
+    const currentContent = form.getValues("content") ?? '';
+    const words = currentContent.split(/\s/);
+    words[words.length - 1] = `@${username} `;
+    form.setValue("content", words.join(' '));
+    setShowSuggestions(false);
+  };
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastUserElementRef = useCallback((node: HTMLLIElement | null) => {
+    if (isFetchingNextPage) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [isFetchingNextPage, fetchNextPage, hasNextPage]);
 
   async function onSubmit(values: CommentFormValues) {
     if (!values.content && !commentImage) {
@@ -132,11 +194,33 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Textarea
-                      placeholder="Add a comment..."
-                      className="min-h-[60px]"
-                      {...field}
-                    />
+                    <div className="relative">
+                      <Textarea
+                        placeholder="Add a comment..."
+                        className="min-h-[60px]"
+                        {...field}
+                        onChange={handleContentChange}
+                      />
+                      {showSuggestions && uniqueMentionSuggestions.length > 0 && (
+                        <ul className="absolute z-10 w-52 mt-1 border rounded shadow-lg max-h-60 overflow-y-auto bg-card text-card-foreground">
+                          {uniqueMentionSuggestions.map((user, index) => (
+                            <li
+                              key={user.$id}
+                              ref={index === uniqueMentionSuggestions.length - 1 && hasNextPage ? lastUserElementRef : null}
+                              className="p-2 cursor-pointer flex items-center hover:bg-muted"
+                              onClick={() => handleUserSelect(user.username)}
+                            >
+                              <Avatar className="w-8 h-8 mr-2">
+                                <AvatarImage src={user.imageUrl} alt={user.username} />
+                                <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              {user.username}
+                            </li>
+                          ))}
+                          {/* {isFetchingNextPage && <li className="p-2 text-center">Loading more...</li>} */}
+                        </ul>
+                      )}
+                    </div>
                   </FormControl>
                 </FormItem>
               )}

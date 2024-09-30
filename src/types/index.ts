@@ -30,6 +30,7 @@ export type INavLink = {
     creator: string;
     parentId?: string;
     level: number;
+    imageId?:string;
   };
 
   export type ICTFQuestion = {
@@ -71,6 +72,11 @@ export type INavLink = {
   };
 
   export type IShare = {
+    user: IUser;             // ID of the user who saved the post (relationship with user)
+    post: IPost;         // ID of the shared post (relationship with posts)
+  };
+
+  export type ILike = {
     user: IUser;             // ID of the user who saved the post (relationship with user)
     post: IPost;         // ID of the shared post (relationship with posts)
   };

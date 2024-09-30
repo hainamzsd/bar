@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
-import { addComment, addReply, fetchReplies, fetchTopLevelComments } from '../appwrite/comment-api'; // Adjust path if needed
+import { addComment, addReply, fetchCommentCount, fetchReplies, fetchTopLevelComments } from '../appwrite/comment-api'; // Adjust path if needed
 import { IComment, IUser } from '@/types';
 import { CommentFromAPI } from '@/types/comment';
 
@@ -48,7 +48,13 @@ const COMMENTS_PER_PAGE = 4;
       staleTime: 60000, // Cache for 1 minute
     });
   };
-  
+  export const useCommentCount = (postId: string) => {
+    return useQuery({
+      queryKey: ['commentCount', postId],
+      queryFn: () => fetchCommentCount(postId),
+      staleTime: 60000, // Optional: cache it for 1 minute
+    });
+  };
   export const useFetchReplies = (parentCommentId: string, postId: string) => {
     return useInfiniteQuery({
       queryKey: ['replies', parentCommentId, postId], // Include postId in queryKey

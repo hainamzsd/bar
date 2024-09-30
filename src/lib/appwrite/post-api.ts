@@ -53,10 +53,9 @@ import { extractMentions } from '../utils';
           appwriteConfig.userCollectionId as string,
           [Query.equal('username', username)]
         );
-        console.log(users)
         if (users.documents.length > 0) {
           const mentionedUser = users.documents[0];
-  
+
           // Create a mention document
           await databases.createDocument(
             appwriteConfig.databaseId as string,
