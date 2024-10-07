@@ -10,7 +10,9 @@ export const appwriteConfig = {
     saveCollectionId: process.env.NEXT_PUBLIC_APPWRITE_SAVEPOSTS_ID,
     commentCollectionId: process.env.NEXT_PUBLIC_APPWRITE_COMMENTS_ID,
     mentionCollectionId: process.env.NEXT_PUBLIC_APPWRITE_MENTIONS_ID,
-    likeCollectionId: process.env.NEXT_PUBLIC_APPWRITE_LIKES_ID
+    likeCollectionId: process.env.NEXT_PUBLIC_APPWRITE_LIKES_ID,
+    savedPostCollectionId: process.env.NEXT_PUBLIC_APPWRITE_SAVEPOSTS_ID,
+    shareCollectionId: process.env.NEXT_PUBLIC_APPWRITE_SHAREPOSTS_ID,
 }
 
 

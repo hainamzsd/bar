@@ -4,8 +4,9 @@ import {
     useQueryClient,
     useInfiniteQuery
 } from '@tanstack/react-query'
-import { createUserAccount, searchUserByUsername, signInAccount, signInFacebook, signOutAccount } from '../appwrite/api'
-import { INewUser } from '@/types'
+import { createUserAccount, getMentions, getMiniProfile, getUserByAccountId, searchUserByUsername, signInAccount, signInFacebook, signOutAccount } from '../appwrite/api'
+import { INewUser, IUser } from '@/types'
+import { MentionFromAPI } from '@/types/mention'
 
 export const useCreateUserAccount = () => {
     return useMutation({
@@ -43,6 +44,35 @@ export const useSearchUserByUsername = (username: string) => {
     });
   };
 
+  export const useGetUserByAccountId = (accountId:string) => {
+    return useQuery({
+        queryKey: ['userByAccountId', accountId],
+        queryFn: () => getUserByAccountId(accountId),
+        enabled: !!accountId,  // Only run the query if an accountId is provided
+        staleTime: 300000, // Cache results for 5 minutes
+        refetchOnWindowFocus: false,
+    });
+};
+
+export const useGetMentions = (userId: string) => {
+  return useQuery<MentionFromAPI[], Error>({
+      queryKey: ['mentionedUser', userId],
+      queryFn: () => getMentions(userId),
+      enabled: !!userId,  // Only run the query if a userId is provided
+      staleTime: 300000, // Cache results for 5 minutes
+      refetchOnWindowFocus: false,
+  });
+};
+
+// export function useGetMiniProfile(userId: string) {
+//   return useQuery<IUser, Error>(
+//     ['miniProfile', userId],
+//     {
+//       queryFn: () => getMiniProfile(userId),
+//       enabled: !!userId,
+//     }
+//   );
+// }
 export const useSignOutAccount = () => {
     return useMutation({
         mutationFn: signOutAccount

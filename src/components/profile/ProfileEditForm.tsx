@@ -6,7 +6,7 @@ import { IUser } from '@/types';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea'; // Assuming you have a Textarea component
-import { DatePicker } from '../DatePicker';
+import { DatePicker } from '../shared/DatePicker';
 
 interface ProfileEditFormProps {
   user: IUser;

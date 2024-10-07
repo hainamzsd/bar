@@ -135,8 +135,8 @@ const TopBar = () => {
                 <DropdownMenuItem 
                 className='py-3'
                 onClick={() => {
-                  signOut()
                   router.replace("/");
+                  signOut()
                   }}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Đăng xuất</span>

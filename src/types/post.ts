@@ -8,6 +8,7 @@ export type PostFromAPI = {
     caption: string;
     content: string;
     creator: {
+      accountId: string;
       username: string;
       email: string;
       bio: string | null;

@@ -1,6 +1,7 @@
 import { INewUser, IUser } from "@/types";
 import {ID, Models, OAuthProvider, Query} from 'appwrite'
 import { account, appwriteConfig, avatars, databases } from "./config";
+import { MentionFromAPI } from "@/types/mention";
 
 export async function createUserAccount(user: INewUser){
     try{
@@ -105,6 +106,57 @@ export async function signInFacebook() {
         
     }
 }
+
+export async function getUserByAccountId(accountId:string) {
+    try {
+        const userDocument = await databases.listDocuments(
+            appwriteConfig.databaseId as any,
+            appwriteConfig.userCollectionId as any,
+            [Query.equal('accountId', accountId)]
+        );
+
+        if (!userDocument || userDocument.documents.length === 0) {
+            throw new Error('User not found');
+        }
+
+        return userDocument.documents[0] as any
+    } catch (error) {
+        console.error("Error fetching user by accountId:", error);
+        throw error;  // Rethrow the error for upstream handling
+    }
+}
+
+export async function getMentions(userId: string): Promise<MentionFromAPI[]> {
+    try {
+      const response = await databases.listDocuments(
+        appwriteConfig.databaseId as any,
+        appwriteConfig.mentionCollectionId as any,
+        [
+          Query.equal('mentionedUser', userId),
+          Query.orderDesc('$createdAt'),
+          Query.limit(100)
+        ]
+      );
+      return response.documents as any[];
+    } catch (error) {
+      console.error("Error fetching mentions:", error);
+      throw error;
+    }
+  }
+  
+  export async function getMiniProfile(userId: string): Promise<IUser> {
+    try {
+      const response = await databases.getDocument(
+        appwriteConfig.databaseId as any,
+        appwriteConfig.userCollectionId as any,
+        userId
+      );
+      return response as any;
+    } catch (error) {
+      console.error("Error fetching mini profile:", error);
+      throw error;
+    }
+  }
 export async function getCurrentUser(){
     try{
         const currentAccount = await account.get();

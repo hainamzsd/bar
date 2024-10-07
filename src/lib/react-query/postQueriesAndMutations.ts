@@ -7,8 +7,10 @@ import {
   getPostById, 
   getAllPosts, 
   uploadMedia, 
-  searchPostsByTitle
+  searchPostsByTitle,
+  getMentionsByPostId
 } from '../appwrite/post-api';
+import { MentionFromAPI } from '@/types/mention';
 
 // Hook to create a post
 export const useCreatePost = () => {
@@ -45,7 +47,15 @@ export const useDeletePost = () => {
     mutationFn: (postId: string) => deletePost(postId)
   });
 };
-
+export const useGetMentionsByPostId = (postId: string) => {
+  return useQuery<MentionFromAPI[], Error>({
+      queryKey: ['mentions', postId],
+      queryFn: () => getMentionsByPostId(postId),
+      enabled: !!postId, // Only run the query if a postId is provided
+      staleTime: 300000, // Cache results for 5 minutes
+      refetchOnWindowFocus: false,
+  });
+};
 // Hook to fetch a post by ID
 export const useGetPostById = (postId: string) => {
   return useQuery({

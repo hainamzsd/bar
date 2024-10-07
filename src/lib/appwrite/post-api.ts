@@ -2,6 +2,7 @@
   import { databases, appwriteConfig, storage } from './config';
   import { IPost } from '@/types';
 import { extractMentions } from '../utils';
+import { MentionFromAPI } from '@/types/mention';
 
   // Function to create a new post
   export async function createPost(post: IPost, mediaFile?: File) {
@@ -212,3 +213,22 @@ import { extractMentions } from '../utils';
       throw error;
     }
   }
+
+  export async function getMentionsByPostId(postId: string): Promise<MentionFromAPI[]> {
+    try {
+        const response = await databases.listDocuments(
+            appwriteConfig.databaseId as string,
+            appwriteConfig.mentionCollectionId as string,
+            [
+                Query.equal('post', postId),
+                Query.orderDesc('$createdAt'),
+                Query.limit(100) // Limit the number of results as needed
+            ]
+        );
+
+        return response.documents as any;
+    } catch (error) {
+        console.error("Error fetching mentions by postId:", error);
+        throw error;
+    }
+}

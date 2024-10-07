@@ -1,5 +1,6 @@
 import React from "react";
 import { LucideIcon } from "lucide-react"
+import { PostFromAPI } from "./post";
 export type IContextType = {
   user: IUser;
   isLoading: boolean;
@@ -67,15 +68,25 @@ export type INavLink = {
   };
 
   export type ISavedPost = {
-    user: IUser;             // ID of the user who saved the post (relationship with user)
-    post: IPost;             // ID of the saved post (relationship with post)
+    $id?: string;
+    user: string;             // ID of the user who saved the post (relationship with user)
+    post: string;             // ID of the saved post (relationship with post)
   };
+
+  export type ISavedPostFromAPI = {
+    user: IUser;             // ID of the user who saved the post (relationship with user)
+    post: PostFromAPI;
+  }
 
   export type IShare = {
-    user: IUser;             // ID of the user who saved the post (relationship with user)
-    post: IPost;         // ID of the shared post (relationship with posts)
+    $id?: string;
+  user: string;
+  post: string;
+  comment?: string;
+  createdAt?: string;
   };
 
+ 
   export type ILike = {
     user: IUser;             // ID of the user who saved the post (relationship with user)
     post: IPost;         // ID of the shared post (relationship with posts)
