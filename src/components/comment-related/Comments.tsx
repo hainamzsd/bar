@@ -34,14 +34,14 @@ function Comment({ comment, isReply = false }: { comment: CommentFromAPI; isRepl
   }
 
   const totalReplies = replies.length
-
+  console.log(comment.creator)
   return (
     <div className={`w-full bg-card text-card-foreground rounded-lg ${isReply ? 'ml-8 mt-2' : ''}`}>
       <div className="">
         <div className="flex items-start gap-3">
           <Avatar className="w-8 h-8">
             <AvatarImage src={comment.creator.imageUrl} alt={comment.creator.username} />
-            <AvatarFallback>{comment.creator.username.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{comment.creator.username.charAt(0) || 'CN'}</AvatarFallback>
           </Avatar>
           <div className="flex-1 space-y-0">
             <div className="flex items-center justify-between">

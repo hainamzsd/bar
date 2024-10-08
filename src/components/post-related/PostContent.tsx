@@ -23,7 +23,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
 type PostProps = {
   id: string;
-  title: string;
+  caption: string;
   imageUrl?: string;
   content?: string;
   tags?: string[];
@@ -31,7 +31,7 @@ type PostProps = {
   authorAvatar?: string;
   creatorId: string;
   isEditing: boolean;
-  onUpdate: (data: { title: string; content: string }) => void;
+  onUpdate: (data: { caption: string; content?: string }) => void;
   onCancelEdit: () => void;
   mentionedUsers?: any[];
 };
@@ -76,35 +76,39 @@ function MentionPopover({ children, id }: { children: React.ReactNode, id: strin
 }
 
 const postSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(100, 'Title must be 100 characters or less'),
-  content: z.string().min(1, 'Content is required').max(1000, 'Content must be 1000 characters or less'),
+  caption: z.string().min(1, 'Title is required').max(100, 'Title must be 100 characters or less'),
+  content: z.string().optional(),
 });
 
-export default function PostContent({ id, title, imageUrl, content, tags, author, authorAvatar, creatorId, isEditing, onUpdate, onCancelEdit, mentionedUsers }: PostProps) {
+export default function PostContent({ id, caption, imageUrl, content, tags, author, authorAvatar, creatorId, isEditing, onUpdate, onCancelEdit, mentionedUsers }: PostProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const { user } = useUserContext();
   const toggleFullscreen = () => setIsFullscreen(!isFullscreen)
   const { data: commentCount, isPending } = useCommentCount(id);
   const highlightMentions = (content: string) => {
     const mentionRegex = /@(\w+)/g;
-    console.log(mentionedUsers)
-    const parts = content.split(/(\s+)/).map((part, index) => {
-      const username = part.slice(1); // Remove the @ symbol
-      const mentionedUser = mentionedUsers?.find(user => user.username === username);
-      if (mentionedUser) {
-        return (
-          <MentionPopover key={index} id={mentionedUser.accountId}>
-            <Badge variant="default" className="mr-1 text-sm">@{mentionedUser.username}</Badge>
-          </MentionPopover>
-        );
-      }
+
+    // Split the content by mentions, keeping the mentions in the array
+    const parts = content.split(mentionRegex).map((part, index) => {
+        // Check if this part is a mention
+        const mentionedUser = mentionedUsers?.find(user => user.username === part);
+        if (mentionedUser) {
+            return (
+                <MentionPopover key={index} id={mentionedUser.accountId}>
+                    <Badge variant="default" className="mr-1 text-sm">@{mentionedUser.username}</Badge>
+                </MentionPopover>
+            );
+        }
+        // Return the original part (non-mention text)
+        return part;
     });
+
     return <>{parts}</>;
-  };
+};
   const form = useForm<z.infer<typeof postSchema>>({
     resolver: zodResolver(postSchema),
     defaultValues: {
-      title: title,
+      caption: caption,
       content: content || '',
     },
   });
@@ -121,7 +125,7 @@ export default function PostContent({ id, title, imageUrl, content, tags, author
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="title"
+                name="caption"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
@@ -151,7 +155,7 @@ export default function PostContent({ id, title, imageUrl, content, tags, author
           <>
             <Link href={`/dashboard/post/${id}`} className="group">
               <h2 className="text-xl font-bold flex items-center gap-2 hover:text-blue-500 transition-colors">
-                {title}
+                {caption}
                 <ExternalLinkIcon className="h-4 w-4 transition-opacity" />
               </h2>
             </Link>
@@ -177,7 +181,7 @@ export default function PostContent({ id, title, imageUrl, content, tags, author
               <ShareButton 
                 postId={id} 
                 userId={user.accountId}
-                postTitle={title}
+                postTitle={caption}
                 postContent={content ?? ''}
                 postImage={imageUrl}
                 authorName={author}

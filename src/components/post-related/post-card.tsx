@@ -40,7 +40,7 @@ export function PostCard({ post }: PostCardProps) {
     if (window.confirm('Are you sure you want to delete this post?')) {
       deletePost(post.$id, {
         onSuccess: () => {
-          queryClient.invalidateQueries(['posts']);
+          queryClient.invalidateQueries({ queryKey: ['posts'] });
           setAlertInfo({ type: 'success', message: 'Post deleted successfully' });
         },
         onError: (error) => {
@@ -51,19 +51,19 @@ export function PostCard({ post }: PostCardProps) {
     }
   };
 
-  const handleUpdatePost = (updatedData: { title: string; content: string }) => {
+  const handleUpdatePost = (updatedData: { caption: string; content?: string }) => {
     updatePost(
       { postId: post.$id, updatedData },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries(['post', post.$id]);
-          queryClient.invalidateQueries(['posts']);
+          queryClient.invalidateQueries({ queryKey: ['post', post.$id] });
+          queryClient.invalidateQueries({ queryKey: ['posts'] });
           setIsEditing(false);
-          setAlertInfo({ type: 'success', message: 'Post updated successfully' });
+          setAlertInfo({ type: 'success', message: 'Cập nhật bài viết thành công.' });
         },
         onError: (error:any) => {
           console.error('Error updating post:', error);
-          setAlertInfo({ type: 'error', message: 'Failed to update post. Please try again.' });
+          setAlertInfo({ type: 'error', message: 'Cập nhật bài viết thất bại. Vui lòng thử lại sau.' });
         },
       }
     );
@@ -73,7 +73,7 @@ export function PostCard({ post }: PostCardProps) {
       {alertInfo && (
         <Alert variant={alertInfo.type === 'success' ? 'default' : 'destructive'}>
           {alertInfo.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-          <AlertTitle>{alertInfo.type === 'success' ? 'Success' : 'Error'}</AlertTitle>
+          <AlertTitle>{alertInfo.type === 'success' ? 'Thành công' : 'Thất bại'}</AlertTitle>
           <AlertDescription>{alertInfo.message}</AlertDescription>
         </Alert>
       )}
@@ -87,7 +87,7 @@ export function PostCard({ post }: PostCardProps) {
       />
       <PostContent
         id={post.$id}
-        title={post.caption}
+        caption={post.caption}
         imageUrl={post.imageUrl}
         content={post.content}
         tags={post.tags}

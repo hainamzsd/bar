@@ -13,7 +13,8 @@ type AnimeDetail = {
   url: string
   images: {
     jpg: {
-      image_url: string
+      image_url: string,
+      large_image_url:string
     }
   }
   trailer: {
@@ -118,7 +119,7 @@ export function AnimeDetailModal({ animeId, isOpen, onClose }: AnimeDetailModalP
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="w-full md:w-1/3">
                   <Image
-                    src={animeDetail?.images.jpg.image_url || '/placeholder.svg'}
+                    src={animeDetail?.images.jpg.large_image_url || '/placeholder.svg'}
                     alt={animeDetail?.title || 'Anime cover'}
                     width={300}
                     height={400}

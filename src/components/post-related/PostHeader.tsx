@@ -25,6 +25,7 @@ type PostHeaderProps = {
 export default function PostHeader({date, username, avatar, creatorId, onEdit, onDelete}: PostHeaderProps) {
   const { user } = useUserContext();
   console.log(creatorId)
+  console.log("current user" + user.accountId )
   return (
     <CardHeader className="flex flex-row items-center gap-4">
       <Avatar className="rounded-full">

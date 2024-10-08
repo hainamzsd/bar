@@ -14,7 +14,8 @@ type Anime = {
   title: string
   images: {
     jpg: {
-      image_url: string
+      image_url: string,
+      large_image_url:string
     }
   }
   synopsis: string
@@ -96,7 +97,7 @@ export function SeasonalAnimeComponent() {
           <CardContent className="flex-grow flex flex-col">
             <div className="relative h-48 mb-4">
               <Image
-                src={anime.images.jpg.image_url}
+                src={anime.images.jpg.large_image_url}
                 alt={anime.title}
                 layout="fill"
                 objectFit="cover"
