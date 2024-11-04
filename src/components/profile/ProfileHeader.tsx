@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, ChangeEvent } from 'react';
 import Cropper from 'react-easy-crop';
 import { Button } from '@/components/ui/button';
@@ -12,9 +14,23 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import { deleteFile, updateUser, uploadMedia } from '@/lib/appwrite/api';
+import { useUserContext } from '@/context/AuthContext';
+import { IUser } from '@/types';
 
-const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgBackground: string | undefined } }> = ({ user }) => {
-  const [backgroundImage, setBackgroundImage] = useState<string | null>(user.imgBackground || null);
+interface ProfileHeaderProps {
+  user: {
+    accountId: string;
+    imageUrl: string;
+    username: string;
+    backgroundUrl: string | undefined;
+  }
+}
+
+import { PuffLoader } from 'react-spinners';
+
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(user.backgroundUrl || null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
@@ -22,25 +38,34 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
   const [zoom, setZoom] = useState(1);
   const [repositionMode, setRepositionMode] = useState(false);
   const [avatarImage, setAvatarImage] = useState<string>(user.imageUrl);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
-
-  const handleBackgroundUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const { updateUserInfo, user: currentUser } = useUserContext();
+  console.log(user.accountId)
+  const handleBackgroundUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (file.size < 200000) {
-          toast({
-            title: 'Error',
-            variant: 'destructive',
-            description: 'Image is too small, please upload a larger one',
-          });
-          return;
+      if (file.size < 200000) {
+        toast({
+          title: 'Lỗi',
+          variant: 'destructive',
+          description: 'Ảnh quá nhỏ, vui lòng tải lên ảnh lớn hơn',
+        });
+        return;
+      }
+      try {
+        const result = await uploadMedia(file);
+        if (result) {
+          setOriginalImage(result.imageUrl.toString());
+          setImageToCrop(result.imageUrl.toString());
         }
-        setOriginalImage(reader.result as string);
-        setImageToCrop(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        toast({
+          title: 'Lỗi',
+          variant: 'destructive',
+          description: 'Không thể tải lên ảnh nền',
+        });
+      }
     }
   };
 
@@ -49,11 +74,37 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
     setCroppedImage(croppedImage);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (croppedImage) {
-      setBackgroundImage(croppedImage);
-      setImageToCrop(null);
-      setRepositionMode(false);
+      setIsUploading(true);
+      let result;
+      try {
+        const file = await fetch(croppedImage).then(r => r.blob()).then(blobFile => new File([blobFile], "background.png", { type: "image/png" }));
+        result = await uploadMedia(file);
+        if (result) {
+          const updatedUser = await updateUser(user.accountId, { backgroundUrl: result.imageUrl.toString() });
+          setBackgroundImage(result.imageUrl.toString());
+          updateUserInfo(updatedUser as unknown as IUser);
+          setImageToCrop(null);
+          setRepositionMode(false);
+          toast({
+            title: 'Thành công',
+            description: 'Ảnh nền đã được cập nhật thành công',
+          });
+        }
+      } catch (error) {
+        console.error("Lỗi khi cập nhật ảnh nền:", error);
+        if (result?.imageId) {
+          await deleteFile(result.imageId);
+        }
+        toast({
+          title: 'Lỗi',
+          variant: 'destructive',
+          description: 'Không thể cập nhật ảnh nền',
+        });
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -69,36 +120,62 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
     }
   };
 
-  const handleAvatarUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    let result;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarImage(reader.result as string);
-        // Here you would typically upload the new avatar to your server
+      try {
+        result = await uploadMedia(file);
+        if (result && result.imageUrl) {
+          const updatedUser = await updateUser(user.accountId, {
+            imageUrl: result.imageUrl.toString(),
+            imageId: result.imageId,
+          });
+          setAvatarImage(result.imageUrl.toString());
+          updateUserInfo(updatedUser as unknown as IUser);
+          toast({
+            title: 'Thành công',
+            description: 'Ảnh đại diện đã được cập nhật thành công',
+          });
+        } else {
+          if (result?.imageId) {
+            await deleteFile(result.imageId);
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi khi cập nhật ảnh đại diện:", error);
+        if (result?.imageId) {
+          await deleteFile(result.imageId);
+        }
         toast({
-          title: 'Thành công',
-          description: 'Avatar tải lên thành công',
+          title: 'Lỗi',
+          description: 'Không thể cập nhật ảnh đại diện',
+          variant: 'destructive',
         });
-      };
-      reader.readAsDataURL(file);
+      }
     }
-  };
+  }
 
   return (
     <div className="relative h-80">
       <div
-        className={`w-full h-full ${backgroundImage ? 'relative' : 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500'}`}
+        className={`w-full h-full ${backgroundImage || user.backgroundUrl ? 'relative' : 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500'}`}
       >
         {imageToCrop ? (
           <div className="relative w-full h-full">
             <div className="absolute top-2 left-2 z-20 flex space-x-2">
-              <Button variant="outline" onClick={handleSave}>
-                <Check className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" onClick={handleCancel}>
-                <X className="h-4 w-4" />
-              </Button>
+              {isUploading ? (
+                <PuffLoader color="hsl(var(--secondary))" size={20} />
+              ) : (
+                <>
+                  <Button variant="outline" onClick={handleSave}>
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" onClick={handleCancel}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
             </div>
             <div className="relative w-full h-full z-10">
               <Cropper
@@ -115,11 +192,11 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
           </div>
         ) : (
           <>
-            {backgroundImage ? (
+            {backgroundImage || user.backgroundUrl ? (
               <>
                 <img
-                  src={backgroundImage}
-                  alt="Profile Background"
+                  src={backgroundImage || user.backgroundUrl}
+                  alt="Ảnh nền hồ sơ"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-2 right-2 z-20">
@@ -144,7 +221,7 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Button variant="outline" onClick={() => document.getElementById('background-upload')?.click()}>
-                  <Camera className="mr-2 h-4 w-4" /> Upload Background Image
+                  <Camera className="mr-2 h-4 w-4" /> Tải lên ảnh nền
                 </Button>
               </div>
             )}
@@ -161,8 +238,14 @@ const ProfileHeader: React.FC<{ user: { imageUrl: string; username: string; imgB
       <div className="absolute bottom-0 left-8 transform translate-y-1/2 z-30">
         <div className="relative group">
           <Avatar className="w-40 h-40 border-4 border-background shadow-lg">
-            <AvatarImage src={user.imageUrl ? user.imageUrl : avatarImage} alt={user.username} className='object-cover'/>
-            <AvatarFallback>{user.username.split(' ').map((n) => n[0]).join('')}</AvatarFallback>
+            <AvatarImage 
+              src={avatarImage || currentUser.imageUrl} 
+              alt={user.username} 
+              className='object-cover'
+            />
+            <AvatarFallback>
+              {user.username.split(' ').map((n) => n[0]).join('')}
+            </AvatarFallback>
           </Avatar>
           <div className="absolute inset-0 flex items-center justify-center">
             <label htmlFor="avatar-upload" className="cursor-pointer">

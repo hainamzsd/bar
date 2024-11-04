@@ -213,6 +213,28 @@ import { MentionFromAPI } from '@/types/mention';
       throw error;
     }
   }
+  export async function getPostsByUserId(userId: string) {
+    try {
+      // Query the database for posts with the specified userId
+      const posts = await databases.listDocuments(
+        appwriteConfig.databaseId as string,
+        appwriteConfig.postCollectionId as string,
+        [
+          Query.equal('creator', userId) // Assuming 'userId' is the field name in your post documents
+        ]
+      );
+  
+      // Optionally, sort the posts by creation date
+      const sortedPosts = posts.documents.sort(
+        (a, b) => new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime()
+      );
+  
+      return sortedPosts;
+    } catch (error) {
+      console.error('Error fetching posts by userId:', error);
+      throw error;
+    }
+  }
 
   export async function getMentionsByPostId(postId: string): Promise<MentionFromAPI[]> {
     try {

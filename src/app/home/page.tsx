@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Head from "next/head";
 import { useTheme } from "next-themes";
 import PopChat from "@/components/VNChat";
 import dynamic from "next/dynamic";
@@ -37,9 +36,6 @@ export default function Page() {
 
   return (
     <>
-      <Head>
-        <title>3D Model Viewer</title>
-      </Head>
       <div style={{ height: "100vh" }}>
         <ModelViewer />
         <Menu />

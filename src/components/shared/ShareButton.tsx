@@ -18,7 +18,6 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from '../ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import Head from 'next/head'
 
 type ShareButtonProps = {
   postId: string
@@ -65,9 +64,6 @@ export function ShareButton({ postId, userId, postTitle, postContent, postImage,
 
   return (
     <>
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-      </Head>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button variant="ghost" size="sm">

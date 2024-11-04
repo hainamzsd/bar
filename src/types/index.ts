@@ -1,13 +1,14 @@
 import React from "react";
 import { LucideIcon } from "lucide-react"
 import { PostFromAPI } from "./post";
-export type IContextType = {
+export interface IContextType {
   user: IUser;
   isLoading: boolean;
   setUser: React.Dispatch<React.SetStateAction<IUser>>;
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   checkAuthUser: () => Promise<boolean>;
+  updateUserInfo: (userData: Partial<IUser>) => Promise<boolean>;
 }
 
 
@@ -43,8 +44,8 @@ export type INavLink = {
   };
   
   export type IFollowing = {
-    followingUserId: string;  
-    followedUserId: string;   
+    userFollowingId: string;  
+    userFollowerId: string;   
   };
 
   export type INotification = {
@@ -101,15 +102,17 @@ export type INavLink = {
     backgroundUrl?: string | undefined;
     dob?: string | undefined;
     gender?: boolean | undefined;
-    facebook?: string | undefined;
-    twitter?: string | undefined;
-    joinDate: string | undefined
+    facebookLink?: string | undefined;
+    twitterLink?: string | undefined;
+    joinDate: string | undefined;
+    imageId?: string;
     role: 'customer' | 'staff';
     isActive: boolean;
     ctfStatus?: 'not_started' | 'in_progress' | 'completed';
     achievements?: IAchievement[];
     cTFQuestions?: ICTFQuestion[];
     follower?: IFollowing[];
+    backgroundImageId?: string;
   };
 
   export type INewUser = {

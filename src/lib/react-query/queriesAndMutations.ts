@@ -4,7 +4,7 @@ import {
     useQueryClient,
     useInfiniteQuery
 } from '@tanstack/react-query'
-import { createUserAccount, getMentions, getMiniProfile, getUserByAccountId, searchUserByUsername, signInAccount, signInFacebook, signOutAccount } from '../appwrite/api'
+import { createUserAccount, getMentions, getMiniProfile, getUserByAccountId, searchUserByUsername, signInAccount, signInFacebook, signOutAccount, updateUser } from '../appwrite/api'
 import { INewUser, IUser } from '@/types'
 import { MentionFromAPI } from '@/types/mention'
 
@@ -73,6 +73,8 @@ export const useGetMentions = (userId: string) => {
 //     }
 //   );
 // }
+
+
 export const useSignOutAccount = () => {
     return useMutation({
         mutationFn: signOutAccount
@@ -84,3 +86,22 @@ export const useSignInFacebook = () => {
         mutationFn: signInFacebook,
     });
 };
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ userId, userData }: { userId: string; userData: Partial<IUser> }) => 
+      updateUser(userId, userData),
+    onSuccess: (updatedUser) => {
+      // Ensure updatedUser has the expected structure
+      if (updatedUser && updatedUser.$id) {
+        // Invalidate and refetch relevant queries
+        queryClient.invalidateQueries({ queryKey: ['userByAccountId', updatedUser.$id] });
+        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      }
+    },
+  });
+};
+
+

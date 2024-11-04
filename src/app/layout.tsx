@@ -7,7 +7,6 @@ import AuthProvider from "@/context/AuthContext";
 import QueryProvider from "@/lib/react-query/queryProvider";
 import { Suspense } from "react";
 import Loading from "./loading";
-import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,9 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-      </Head>
+
       <body>
         <QueryProvider>
           <AuthProvider>

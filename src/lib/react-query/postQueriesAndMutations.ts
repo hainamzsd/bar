@@ -8,9 +8,11 @@ import {
   getAllPosts, 
   uploadMedia, 
   searchPostsByTitle,
-  getMentionsByPostId
+  getMentionsByPostId,
+  getPostsByUserId
 } from '../appwrite/post-api';
 import { MentionFromAPI } from '@/types/mention';
+import { PostFromAPI } from '@/types/post';
 
 // Hook to create a post
 export const useCreatePost = () => {
@@ -71,10 +73,41 @@ export const useGetAllPosts = () => {
     queryFn: () => getAllPosts()
   });
 };
-
-// Hook to upload media
 export const useUploadMedia = () => {
   return useMutation({
     mutationFn: (file: File) => uploadMedia(file)
+  });
+};
+export const useGetPostsByUserId = (userId: string) => {
+  return useQuery<PostFromAPI[], Error>({
+    queryKey: ['posts', 'user', userId],
+    queryFn: async () => {
+      const documents = await getPostsByUserId(userId);
+      return documents.map(doc => ({
+        $collectionId: doc.$collectionId,
+        $createdAt: doc.$createdAt,
+        $id: doc.$id,
+        $permissions: doc.$permissions,
+        $updatedAt: doc.$updatedAt,
+        caption: doc.caption,
+        content: doc.content,
+        creator: {
+          accountId: doc.creator.accountId,
+          username: doc.creator.username,
+          email: doc.creator.email,
+          bio: doc.creator.bio,
+          imageUrl: doc.creator.imageUrl,
+        },
+        imageId: doc.imageId,
+        imageUrl: doc.imageUrl,
+        mentions: doc.mentions,
+        tags: doc.tags,
+      }));
+    },
+    enabled: !!userId,
+    staleTime: 300000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 };

@@ -2,7 +2,7 @@
 
 import { use, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { HeartIcon, MessageCircleIcon, SendIcon, BookmarkIcon, XIcon, ExternalLinkIcon } from 'lucide-react'
+import { HeartIcon, MessageCircleIcon, SendIcon, BookmarkIcon, XIcon, ExternalLinkIcon, AlertCircle } from 'lucide-react'
 import { CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
@@ -20,6 +20,8 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useGetUserByAccountId } from '@/lib/react-query/queriesAndMutations'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { Skeleton } from '../ui/skeleton'
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 
 type PostProps = {
   id: string;
@@ -41,9 +43,34 @@ type PostProps = {
 function MiniProfile({ id }: { id: string }) {
   const { data: userData, isLoading, error } = useGetUserByAccountId(id);
 
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error loading profile</div>
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center space-x-4 p-4 animate-pulse">
+        <Skeleton className="h-16 w-16 rounded-full" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[200px]" />
+          <Skeleton className="h-4 w-[150px]" />
+          <div className="flex space-x-2">
+            <Skeleton className="h-4 w-[80px]" />
+            <Skeleton className="h-4 w-[80px]" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Lỗi</AlertTitle>
+        <AlertDescription>
+          Lỗi tải profile. Vui lòng thử lại sau.
+        </AlertDescription>
+      </Alert>
+    )
+  }
   return (
     <div className="flex items-center space-x-4 p-4">
       <Avatar className="h-16 w-16">

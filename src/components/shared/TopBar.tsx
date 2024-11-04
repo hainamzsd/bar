@@ -98,7 +98,7 @@ const TopBar = () => {
 
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Avatar className="border-2 border-primary">
+                <Avatar className="border-2 border-primary hover:border-primary/80 transition-all duration-300">
                   <AvatarImage src={user?.imageUrl || 'https://github.com/shadcn.png'} alt="User Avatar" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>

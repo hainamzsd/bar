@@ -1,12 +1,9 @@
 import { useRouter } from 'next/navigation';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -14,22 +11,18 @@ import {
 } from "@/components/ui/form"
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SignUpValidation } from '../../lib/validation';
+import { SignUpValidation } from '@/lib/validation';
 import * as z from "zod"
-import Loader from '../shared/Loader';
-import { useState } from 'react';
-import { createUserAccount } from '@/lib/appwrite/api';
-import { useToast } from '@/hooks/use-toast'; 
-import { title } from 'process';
-import { Toast } from '../ui/toast';
-import { useCreateUserAccount, useSignInAccount } from '@/lib/react-query/queriesAndMutations';
+import { useToast } from '@/hooks/use-toast';
+import { useCreateUserAccount } from '@/lib/react-query/queriesAndMutations';
 import { useUserContext } from '@/context/AuthContext';
+import { PuffLoader } from 'react-spinners';
+
 const SignUpDialog = () => {
   const router = useRouter();
-  const toast = useToast();
-  const {checkAuthUser, isLoading: isUserLoading} = useUserContext();
+  const { toast } = useToast();
+  const { checkAuthUser } = useUserContext();
   const { mutateAsync: createUserAccount, isPending: isCreatingUser } = useCreateUserAccount();
-  const { mutateAsync: signInAccount, isPending: isSigningIn} = useSignInAccount();
 
   const form = useForm<z.infer<typeof SignUpValidation>>({
     resolver: zodResolver(SignUpValidation),
@@ -44,53 +37,45 @@ const SignUpDialog = () => {
   async function onSubmit(values: z.infer<typeof SignUpValidation>) {
     try {
       const newUser = await createUserAccount(values);
-      if(!newUser){
-        return toast.toast({title:"Tạo tài khoản không thành công",variant:"destructive"})
+      if (!newUser) {
+        throw new Error("Failed to create account");
       }
 
-      const session = await signInAccount({
-        email: values.email,
-        password: values.password
-      })
-      if(!session){
-        return toast.toast({title:"Đăng nhập không thành công, thử lại sau.",variant:"destructive"})
-      }
+      // Add a delay before checking auth to allow for database updates
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       const isLoggedIn = await checkAuthUser();
-      if(isLoggedIn){
+      if (isLoggedIn) {
         form.reset();
-        router.push('/home')
-      }else{
-        return toast.toast({title:"Đăng nhập không thành công, thử lại sau.",variant:"destructive"})
+        router.push('/home');
+      } else {
+        throw new Error("Failed to authenticate");
       }
-    }
-    catch (exception) {
-      return toast.toast({title:"Tạo tài khoản không thành công",variant:"destructive"})
+    } catch (error) {
+      console.error('Sign up error:', error);
+      toast({
+        title: "Đăng ký không thành công",
+        description: error instanceof Error ? error.message : "Vui lòng thử lại sau.",
+        variant: "destructive"
+      });
     }
   }
 
   return (
     <div className="sm:max-w-[425px]">
-      {/* Error Message Template */}
-      <div id="error-message" className="text-red-500 text-sm">
-        {/* Error messages will be displayed here */}
-      </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="username"
             render={({ field }) => (
-              <FormItem className='items-center'>
-                <FormLabel htmlFor="username" className="text-right">
-                  Tên người dùng
-                </FormLabel>
+              <FormItem>
+                <FormLabel htmlFor="username">Tên người dùng</FormLabel>
                 <FormControl>
                   <Input
                     id="username"
                     type="text"
                     placeholder="Nhập tên người dùng"
-                    className="col-span-3"
                     {...field}
                   />
                 </FormControl>
@@ -102,16 +87,13 @@ const SignUpDialog = () => {
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="items-center">
-                <FormLabel htmlFor="email" className="text-right">
-                  Email
-                </FormLabel>
+              <FormItem>
+                <FormLabel htmlFor="email">Email</FormLabel>
                 <FormControl>
                   <Input
                     id="email"
                     type="email"
                     placeholder="you@example.com"
-                    className="col-span-3"
                     {...field}
                   />
                 </FormControl>
@@ -123,16 +105,13 @@ const SignUpDialog = () => {
             control={form.control}
             name="password"
             render={({ field }) => (
-              <FormItem className="items-center">
-                <FormLabel htmlFor="password" className="text-right">
-                  Mật khẩu
-                </FormLabel>
+              <FormItem>
+                <FormLabel htmlFor="password">Mật khẩu</FormLabel>
                 <FormControl>
                   <Input
                     id="password"
                     type="password"
                     placeholder="********"
-                    className="col-span-3"
                     {...field}
                   />
                 </FormControl>
@@ -144,16 +123,13 @@ const SignUpDialog = () => {
             control={form.control}
             name="repassword"
             render={({ field }) => (
-              <FormItem className="items-center">
-                <FormLabel htmlFor="password" className="text-right">
-                  Nhập lại mật khẩu
-                </FormLabel>
+              <FormItem>
+                <FormLabel htmlFor="repassword">Nhập lại mật khẩu</FormLabel>
                 <FormControl>
                   <Input
-                    id="password"
+                    id="repassword"
                     type="password"
                     placeholder="********"
-                    className="col-span-3"
                     {...field}
                   />
                 </FormControl>
@@ -163,12 +139,11 @@ const SignUpDialog = () => {
           />
           <Button
             type='submit'
-            className="mb-3 w-full mt-3"
+            className="w-full"
+            disabled={isCreatingUser}
           >
             {isCreatingUser ? (
-              <div className='flex gap-2 '>
-                Đang tải
-              </div>
+              <PuffLoader size={24} />
             ) : "Đăng ký"}
           </Button>
         </form>

@@ -1,6 +1,6 @@
 import { INewUser, IUser } from "@/types";
 import {ID, Models, OAuthProvider, Query} from 'appwrite'
-import { account, appwriteConfig, avatars, databases } from "./config";
+import { account, appwriteConfig, avatars, databases, storage } from "./config";
 import { MentionFromAPI } from "@/types/mention";
 
 export async function createUserAccount(user: INewUser){
@@ -29,7 +29,21 @@ export async function createUserAccount(user: INewUser){
         return error;
     }
 }
+export async function uploadMedia(file: File): Promise<{ imageUrl: URL; imageId: string } | null> {
+    try {
+      const uploadedFile = await storage.createFile(
+        appwriteConfig.storageId as string, 
+        ID.unique(), 
+        file
+      );
 
+      const imageUrl = storage.getFilePreview(appwriteConfig.storageId as string, uploadedFile.$id);
+      return { imageUrl , imageId: uploadedFile.$id };
+    } catch (error) {
+      console.error("Error uploading media:", error);
+      throw error;
+    }
+  }
 
 export async function saveUserToDB(user: IUser) {
     try {
@@ -60,6 +74,39 @@ export async function saveUserToDB(user: IUser) {
         throw error;  // Re-throw the error to be handled by the caller
     }
 }
+export async function updateUser(userId: string, userData: Partial<IUser>) {
+    try {
+        console.log('Updating user with ID:', userId);
+
+        // Filter out the accountId field from userData
+        const { accountId, ...filteredUserData } = userData;
+
+        const updatedUser = await databases.updateDocument(
+            appwriteConfig.databaseId as any,
+            appwriteConfig.userCollectionId as any,
+            userId,
+            filteredUserData // Use the filtered data
+        );
+
+        if (!updatedUser) throw new Error('Failed to update user');
+
+        return updatedUser;
+    } catch (error) {
+        console.error("Error updating user:", error);
+        throw error;
+    }
+}
+
+export async function deleteFile(fileId: string) {
+    try {
+      await storage.deleteFile(appwriteConfig.storageId as string, fileId);
+
+      return { status: "ok" };
+    } catch (error) {
+      
+      throw error;
+    }
+  }
 
 export async function searchUserByUsername(username: string) {
     try {
@@ -183,4 +230,14 @@ export async function signOutAccount() {
         console.error("Error during logout:", error);
         throw error;  // Rethrow the error to handle it upstream if needed
     }
+}
+
+export async function updateUserBio(accountId: string, bio: string) {
+  try {
+    const updatedUser = await updateUser(accountId, { bio });
+    return updatedUser;
+  } catch (error) {
+    console.error("Error updating user bio:", error);
+    throw error;
+  }
 }
