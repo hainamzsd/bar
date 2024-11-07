@@ -55,7 +55,7 @@ function RealtimeNotificationListener() {
           ) 
 
           if (fullNotification.userId === user.accountId) {
-            newNotifications.push(fullNotification as INotificationFromAPI)
+            newNotifications.push(fullNotification as any)
           }
         } catch (error) {
           console.error("Error fetching full notification:", error)

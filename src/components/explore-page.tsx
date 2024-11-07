@@ -30,6 +30,7 @@ interface Recommendation {
 
 const ExplorePage = () => {
   const { data: posts, isPending: isPostsPending, isError: isPostsError } = useGetAllPosts();
+  const [isPaused, setIsPaused] = useState(false)
   const [animeRecommendations, setAnimeRecommendations] = useState<Recommendation[]>([]);
   const [mangaRecommendations, setMangaRecommendations] = useState<Recommendation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -153,36 +154,46 @@ const ExplorePage = () => {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BookOpen className="w-5 h-5 mr-2" />
-                  Manga Phổ Biến
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="relative flex h-[400px] w-full overflow-hidden rounded-lg [perspective:300px]">
-                  <Marquee
-                    vertical
-                    className="h-full justify-center overflow-hidden [--duration:200s] [--gap:1rem]"
-                    style={{
-                      transform: 'translateX(0px) translateY(0px) translateZ(-50px) rotateX(0deg) rotateY(-20deg) rotateZ(10deg) scale(1.5)',
-                    }}
-                  >
-                    {mangaRecommendations.map((rec, index) => (
-                      <div key={`${rec.mal_id}-${index}`} className="p-2">
-                        <img
-                          src={rec.entry[0].images.jpg.image_url}
-                          alt={rec.entry[0].title}
-                          className="h-40 w-28 rounded-lg object-cover shadow-md"
-                        />
-                      </div>
-                    ))}
-                  </Marquee>
-                  <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white dark:from-background"></div>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white dark:from-background"></div>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <BookOpen className="w-5 h-5 mr-2" />
+            Manga Phổ Biến
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div 
+            className="relative flex h-[400px] w-full overflow-hidden rounded-lg [perspective:300px]"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onClick={() => setIsPaused(!isPaused)}
+          >
+            <Marquee
+              vertical
+              pauseOnHover
+              className="h-full justify-center overflow-hidden [--duration:200s] [--gap:1rem]"
+              style={{
+                transform: 'translateX(0px) translateY(0px) translateZ(-50px) rotateX(0deg) rotateY(-20deg) rotateZ(10deg) scale(1.5)',
+              }}
+              paused={isPaused}
+            >
+              {mangaRecommendations.map((rec, index) => (
+                <div key={`${rec.mal_id}-${index}`} className="p-2 relative">
+                  <img
+                    src={rec.entry[0].images.jpg.image_url}
+                    alt={rec.entry[0].title}
+                    className="h-40 w-28 rounded-lg object-cover shadow-md"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 p-2 rounded-b-lg">
+                    <p className="text-xs text-white truncate">{rec.entry[0].title}</p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+            </Marquee>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white dark:from-background"></div>
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white dark:from-background"></div>
+          </div>
+        </CardContent>
+      </Card>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">

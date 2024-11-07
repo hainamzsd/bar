@@ -42,13 +42,13 @@ export const actions = [
 
 export const references = [
   {
-    route: "/",
+    route: "/dashboard/aboutus",
     label: "Giới thiệu",
     icon: Rabbit
   },
   {
-    route: "/",
-    label: "Hỗ trợ",
+    route: "/dashboard/rules",
+    label: "Hỗ trợ và luật lệ",
     icon: CircleHelp
   },
   {

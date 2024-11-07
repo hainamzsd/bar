@@ -11,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { useGetAllNotifications, useMarkNotificationAsRead } from '@/lib/react-query/notifyQueriesAndMutation'
 import { INotificationFromAPI } from '@/types'
+import Link from 'next/link'
 
 const NotificationContent = () => {
   const { user } = useUserContext()
@@ -58,9 +59,11 @@ const NotificationContent = () => {
                     <AvatarFallback>{notification.sender.username[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
+                    <Link href={notification.relatedId}>
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                       {notification.content}
                     </p>
+                    </Link>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {formatDistanceToNow(new Date(notification.$createdAt), { addSuffix: true, locale: vi })}
                     </p>

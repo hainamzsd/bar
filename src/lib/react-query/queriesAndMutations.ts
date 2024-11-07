@@ -86,6 +86,7 @@ export const useSignInFacebook = () => {
         mutationFn: signInFacebook,
     });
 };
+
 export const useGetUserById = (userId: string) => {
   return useQuery({
     queryKey: ['user', userId],

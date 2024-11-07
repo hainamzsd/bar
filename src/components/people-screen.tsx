@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,45 +8,57 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Filter, Users } from 'lucide-react'
+import { Filter, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Input } from "@/components/ui/input"
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { databases, appwriteConfig } from '@/lib/appwrite/config'
+import { IUser } from "@/types"
+import { updateUser } from '@/lib/appwrite/api'
+import { Query } from 'appwrite'
 
-type Person = {
-  id: number
-  name: string
-  avatar: string
-  role: 'customer' | 'staff'
-  title: string
-}
-
-const people: Person[] = [
-  { id: 1, name: "Naruto Uzumaki", avatar: "https://i.pravatar.cc/150?img=32", role: "customer", title: "Ramen Enthusiast" },
-  { id: 2, name: "Sakura Haruno", avatar: "https://i.pravatar.cc/150?img=44", role: "staff", title: "Barista" },
-  { id: 3, name: "Sasuke Uchiha", avatar: "https://i.pravatar.cc/150?img=59", role: "customer", title: "Coffee Connoisseur" },
-  { id: 4, name: "Hinata Hyuga", avatar: "https://i.pravatar.cc/150?img=47", role: "staff", title: "Pastry Chef" },
-  { id: 5, name: "Kakashi Hatake", avatar: "https://i.pravatar.cc/150?img=15", role: "customer", title: "Mystery Novel Reader" },
-  { id: 6, name: "Ino Yamanaka", avatar: "https://i.pravatar.cc/150?img=46", role: "staff", title: "Flower Arranger" },
-  { id: 7, name: "Shikamaru Nara", avatar: "https://i.pravatar.cc/150?img=12", role: "customer", title: "Chess Master" },
-  { id: 8, name: "Temari", avatar: "https://i.pravatar.cc/150?img=41", role: "staff", title: "Wind Chime Curator" },
-]
+const USERS_PER_PAGE = 9
 
 export function PeopleScreenComponent() {
-  const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'customer' | 'staff'>('all')
-  const [filteredPeople, setFilteredPeople] = useState<Person[]>(people)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const queryClient = useQueryClient()
 
-  useEffect(() => {
-    // Simulate loading delay
-    const timer = setTimeout(() => setIsLoading(false), 2000)
-    return () => clearTimeout(timer)
-  }, [])
+  const { data: users, isLoading, error } = useQuery<any[]>({
+    queryKey: ['users', filter, searchTerm, currentPage],
+    queryFn: async () => {
+      const queries = [Query.limit(USERS_PER_PAGE), Query.offset((currentPage - 1) * USERS_PER_PAGE)]
+      
+      if (filter !== 'all') {
+        queries.push(Query.equal('role', filter))
+      }
+      
+      if (searchTerm) {
+        queries.push(Query.search('username', searchTerm))
+      }
 
-  useEffect(() => {
-    setFilteredPeople(
-      filter === 'all' ? people : people.filter(person => person.role === filter)
-    )
-  }, [filter])
+      const response = await databases.listDocuments(
+        appwriteConfig.databaseId as string,
+        appwriteConfig.userCollectionId as string,
+        queries
+      )
+      return response.documents as any[]
+    },
+  })
 
-  const PersonCard = ({ person }: { person: Person }) => (
+  const updateUserMutation = useMutation({
+    mutationFn: (userData: { userId: string; data: Partial<IUser> }) => 
+      updateUser(userData.userId, userData.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+  })
+
+  const handleUpdateUser = (userId: string, data: Partial<IUser>) => {
+    updateUserMutation.mutate({ userId, data })
+  }
+
+  const PersonCard = ({ person }: { person: IUser }) => (
     <motion.div
       layout
       initial={{ opacity: 0 }}
@@ -57,16 +69,13 @@ export function PeopleScreenComponent() {
         <CardContent className="p-4">
           <div className="flex items-center space-x-4">
             <Avatar className="h-12 w-12">
-              <AvatarImage src={person.avatar} alt={person.name} />
-              <AvatarFallback>{person.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              <AvatarImage src={person.imageUrl} alt={person.username} />
+              <AvatarFallback>{person.username.split(' ').map(n => n[0]).join('')}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-card-foreground truncate">{person.name}</p>
-              <p className="text-sm text-muted-foreground truncate">{person.title}</p>
+              <p className="text-sm font-medium text-card-foreground truncate">{person.username}</p>
+              <p className="text-sm text-muted-foreground truncate">@{person.username}</p>
             </div>
-            <Button variant="outline" size="sm">
-              {person.role === 'customer' ? 'Follow' : 'Chat'}
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -88,59 +97,83 @@ export function PeopleScreenComponent() {
     </Card>
   )
 
-  const renderPeopleSection = (role: 'customer' | 'staff') => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <AnimatePresence>
-        {isLoading
-          ? Array(role === 'customer' ? 6 : 3).fill(0).map((_, index) => <SkeletonCard key={`skeleton-${role}-${index}`} />)
-          : filteredPeople
-              .filter(person => person.role === role)
-              .map(person => <PersonCard key={person.id} person={person} />)
-        }
-      </AnimatePresence>
-    </div>
-  )
-
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">People</h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Filter className="mr-2 h-4 w-4" />
-              Filter
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setFilter('all')}>All</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFilter('customer')}>Customers</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFilter('staff')}>Staff</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      <div className="space-y-8">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Khách hàng (Customers)</h2>
-          {renderPeopleSection('customer')}
-        </div>
-
-        <Separator className="my-8" />
-
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Phục vụ (Staff)</h2>
-          {renderPeopleSection('staff')}
+      <div className="flex justify-between items-center mb-6 flex-col sm:flex-row">
+        <h1 className="text-3xl font-bold">Mọi người</h1>
+        <div className="flex items-center space-x-4 mt-4 sm:mt-0">
+          <Input
+            placeholder="Tìm người dùng..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-64"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Filter className="mr-2 h-4 w-4" />
+                Lọc
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setFilter('all')}>Tất cả</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilter('customer')}>Khách hàng</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilter('staff')}>Nhân viên</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {!isLoading && filteredPeople.length === 0 && (
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {Array(USERS_PER_PAGE).fill(0).map((_, index) => (
+            <SkeletonCard key={`skeleton-${index}`} />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <h2 className="text-lg font-semibold text-red-600">Lỗi tải người dùng</h2>
+          <p className="mt-2 text-muted-foreground">Hãy thử lại sau.</p>
+        </div>
+      ) : users && users.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <AnimatePresence>
+            {users.map(user => (
+              <PersonCard key={user.$id} person={user} />
+            ))}
+          </AnimatePresence>
+        </div>
+      ) : (
         <div className="text-center py-12">
           <Users className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h2 className="mt-4 text-lg font-semibold">No people found</h2>
-          <p className="mt-2 text-muted-foreground">Try changing your filter settings.</p>
+          <h2 className="mt-4 text-lg font-semibold">Không tìm thấy người dùng</h2>
+          <p className="mt-2 text-muted-foreground">Hãy thử thay đổi filter của bạn.</p>
         </div>
       )}
+
+      <div className="mt-8 flex justify-center items-center space-x-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1 || isLoading}
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Trước
+        </Button>
+        <span className="text-sm font-medium">Trang {currentPage}</span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCurrentPage(prev => prev + 1)}
+          disabled={!users || users.length < USERS_PER_PAGE || isLoading}
+        >
+          Sau
+          <ChevronRight className="h-4 w-4 ml-2" />
+        </Button>
+      </div>
     </div>
   )
 }
+
+export default PeopleScreenComponent
