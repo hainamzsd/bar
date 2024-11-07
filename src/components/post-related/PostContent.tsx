@@ -213,6 +213,7 @@ export default function PostContent({ id, caption, imageUrl, content, tags, auth
                 postImage={imageUrl}
                 authorName={author}
                 authorAvatar={authorAvatar}
+                authorId={creatorId}
               />
               <div className="ml-auto">
                 <SaveButton postId={id} userId={user.accountId} />

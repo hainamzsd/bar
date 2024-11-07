@@ -47,14 +47,34 @@ export type INavLink = {
     userFollowingId: string;  
     userFollowerId: string;   
   };
-
-  export type INotification = {
-    notifyId: string;                 // Unique ID for the notification
+ 
+  export type INotificationFromAPI = {
+    $id: string;
+    $createdAt: string;
     relatedId: string;          // ID related to the notification (e.g., post, comment, etc.)
     content: string;            // Notification content
-    // userId: string;             // ID of the user who is notified (relationship with user)
+    userId: {
+      $id: string;
+      username: string;
+      $createdAt: string;
+
+    };             // ID of the user who is notified (relationship with user)
+    sender:{
+      $id: string;
+      username: string;
+      $createdAt: string;
+      imageUrl:string;
+    }
     isRead: boolean;            // Whether the notification has been read
-    type: 'like' | 'comment' | 'follow' | 'share' | 'save'; // Type of notification (enum)
+    type: 'like' | 'comment' | 'follow' | 'share' | 'save' | 'reply'; // Type of notification (enum)
+  };
+  export type INotification = {
+    relatedId: string;          // ID related to the notification (e.g., post, comment, etc.)
+    content: string;            // Notification content
+    userId: string;             // ID of the user who is notified (relationship with user)
+    isRead: boolean;            // Whether the notification has been read
+    type: 'like' | 'comment' | 'follow' | 'share' | 'save' | 'reply'; // Type of notification (enum)
+    sender:string;
   };
 
   export type IPost = {

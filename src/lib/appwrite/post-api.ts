@@ -3,6 +3,8 @@
   import { IPost } from '@/types';
 import { extractMentions } from '../utils';
 import { MentionFromAPI } from '@/types/mention';
+import { createNotification } from './notification-api';
+import { getUserByAccountId } from './api';
 
   // Function to create a new post
   export async function createPost(post: IPost, mediaFile?: File) {
@@ -36,7 +38,7 @@ import { MentionFromAPI } from '@/types/mention';
         throw Error;
       }
 
-      await createMentions(newPost.$id, post.content ?? '', post.creator);
+      await createMentions(newPost.$id, post.content ?? '', post.creator, post.creator);
       return newPost;
     } catch (error) {
       console.error("Error creating post:", error);
@@ -44,7 +46,7 @@ import { MentionFromAPI } from '@/types/mention';
     }
   }
 
-  async function createMentions(postId: string, content: string, mentioningUserId: string) {
+  async function createMentions(postId: string, content: string, mentioningUserId: string, creatorId: string) {
     const mentionedUsernames = extractMentions(content);
     for (const username of mentionedUsernames) {
       try {
@@ -69,7 +71,15 @@ import { MentionFromAPI } from '@/types/mention';
               comment: content
             }
           );
-          console.log(`Mention created for user ${username}`);
+          const mentioningUser = await getUserByAccountId(creatorId);
+          await createNotification({
+            userId: mentioningUserId,
+            type: 'reply',
+            relatedId:postId,
+            content: `Bạn đã ${mentioningUser.username} được nhắc đến trong 1 bài viết.`,
+            isRead: false
+          });
+  
         } else {
           console.warn(`User ${username} not found in the database`);
         }
@@ -146,17 +156,19 @@ import { MentionFromAPI } from '@/types/mention';
   }
 
   // Function to fetch all posts (with optional query parameters)
-  export async function getAllPosts(){
+  export async function getAllPosts(page: number, limit: number = 10) {
     try {
       const posts = await databases.listDocuments(
         appwriteConfig.databaseId as string,
-        appwriteConfig.postCollectionId as string
+        appwriteConfig.postCollectionId as string,
+        [
+          Query.orderDesc('$createdAt'),
+          Query.limit(limit),
+          Query.offset(page * limit),
+        ]
       );
-
-
-      const sortedPost = posts.documents.sort((a,b) => new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime())
-
-      return sortedPost;
+  
+      return posts.documents;
     } catch (error) {
       console.error("Error fetching posts:", error);
       throw error;

@@ -20,6 +20,8 @@ import { getRoleTranslation } from '@/lib/utils'
 import NotificationContent from '../notifications-content'
 import SearchComponent from '../searchs/ExploreSearch'
 import DesktopSearchComponent from '../searchs/SearchExploreDesktop'
+import { useGetUnreadNotificationCount } from '@/lib/react-query/notifyQueriesAndMutation'
+import RealtimeNotificationListener from '../realtime-notification-listener'
 
 const TopBar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -29,7 +31,8 @@ const TopBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
+  const { data: unreadCount = 0 } = useGetUnreadNotificationCount(user.accountId);
+  
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light")
   }
@@ -58,6 +61,7 @@ const TopBar = () => {
 
   return (
     <>
+    <RealtimeNotificationListener />
       <section className='top-0 z-50 w-full h-[64px] fixed border-b-[1px] bg-background' style={{ borderBottomColor: 'hsl(var(--border))' }}>
         <div className='flex justify-between items-center py-3 px-5'>
           <div className='flex items-center'>
@@ -79,21 +83,14 @@ const TopBar = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell />
-                  <Badge className="absolute -top-[0.5px] -right-[0.5px] flex items-center justify-center px-1 min-w-[20px] h-5 text-xs leading-none">
-                    {3 > 99 ? '99+' : '3'}
-                  </Badge>
+                  {unreadCount > 0 && (
+                    <Badge className="absolute -top-[0.5px] -right-[0.5px] flex items-center justify-center px-1 min-w-[20px] h-5 text-xs leading-none">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </Badge>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
-              {/* <NotificationContent notifications={[
-                {
-                  id: '1',
-                  avatarUrl: 'https://github.com/shadcn.png',
-                  fallback: 'CN',
-                  message: 'New message received',
-                  time: '2 hours ago',
-                },
-                // Add more notifications here
-              ]} /> */}
+              <NotificationContent />
             </DropdownMenu>
 
             <DropdownMenu modal={false}>
@@ -135,7 +132,6 @@ const TopBar = () => {
                 <DropdownMenuItem 
                 className='py-3'
                 onClick={() => {
-                  router.replace("/");
                   signOut()
                   }}>
                   <LogOut className="mr-2 h-4 w-4" />

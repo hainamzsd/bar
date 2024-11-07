@@ -3,11 +3,13 @@ import { databases, appwriteConfig, storage } from './config';
 import { IComment, IUser } from '@/types';
 import { CommentFromAPI } from '@/types/comment';
 import { deleteFile } from './post-api';
-import { extractMentions } from '../utils';
+import { extractMentions, getDynamicUrl } from '../utils';
+import { createNotification } from './notification-api';
 
 export async function addComment(
   comment: IComment, 
-  mediaFile?: File
+  postAuthorId: string,
+  mediaFile?: File,
 ) {
   try {
     let imageUrl;
@@ -36,13 +38,21 @@ export async function addComment(
       ID.unique(),
       newComment
     );
-
+    await createMentions(comment.post,savedComment.$id, comment.content ?? '', comment.creator, 'comment');
+    console.log(postAuthorId + "authorID")
+    await createNotification({
+      userId: postAuthorId,
+      type: 'comment',
+      relatedId: getDynamicUrl(`/dashboard/post/${comment.post}`),
+      content: `Bài viết của bạn đã được bình luận.`,
+      isRead: false,
+      sender: comment.creator
+    });
     if (!savedComment && uploadedFile) {
       await deleteFile(uploadedFile.$id);
       throw new Error('Error creating comment, image deleted');
     }
 
-    await createMentions(comment.post,savedComment.$id, comment.content ?? '', comment.creator, 'comment');
     return savedComment;
   } catch (error) {
     console.error('Error adding comment:', error);

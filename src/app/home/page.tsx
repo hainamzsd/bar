@@ -4,10 +4,10 @@ import { useTheme } from "next-themes";
 import PopChat from "@/components/VNChat";
 import dynamic from "next/dynamic";
 import Menu from "@/components/3D/Menu";
-import { InteractiveOverlayComponent } from "@/components/3D/interactive-overlay";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { InteractiveOverlayComponent } from "@/components/3D/interactbuttons/interactive-overlay";
 
 
 const ModelViewer = dynamic(() => import('../../components/3D/ModelViewer') as any, {
@@ -39,7 +39,7 @@ export default function Page() {
       <div style={{ height: "100vh" }}>
         <ModelViewer />
         <Menu />
-        <InteractiveOverlayComponent></InteractiveOverlayComponent>
+        <InteractiveOverlayComponent /> 
         {showChat && <PopChat setShowChat={setShowChat} />}
       </div>
     </>

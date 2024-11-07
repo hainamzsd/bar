@@ -11,6 +11,8 @@ import PostSkeleton from './skeleton/post-skeleton'
 import RandomAnimeImage from './random-anime-image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import InfiniteScrollPosts from './post-related/InfiniteScroll'
+import Marquee from './ui/marquee'
 
 interface Recommendation {
   mal_id: string;
@@ -116,23 +118,7 @@ const ExplorePage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <h2 className="text-2xl font-bold mb-4">Khám Phá Bài Viết Anime</h2>
-          <div className="grid gap-6">
-            {isPostsPending ? (
-              <>
-                {[...Array(5)].map((_, index) => (
-                  <PostSkeleton key={index} />
-                ))}
-              </>
-            ) : isPostsError ? (
-              <p className="text-red-500">Lỗi khi tải bài viết. Vui lòng thử lại sau.</p>
-            ) : (
-              <>
-                {posts?.map((post) => (
-                  <PostCard key={post.$id} post={post as any} />
-                ))}
-              </>
-            )}
-          </div>
+          <InfiniteScrollPosts />
         </div>
         <div className="hidden lg:block">
           <div className="sticky top-[80px] space-y-6">
@@ -144,23 +130,11 @@ const ExplorePage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-[400px] pr-4">
-                  {isLoading ? (
-                    <div className="space-y-2">
-                      {[...Array(5)].map((_, index) => (
-                        <div key={index} className="h-16 bg-gray-200 rounded animate-pulse" />
-                      ))}
-                    </div>
-                  ) : error ? (
-                    <p className="text-red-500 text-sm">{error}</p>
-                  ) : (
-                    <ul className="space-y-4">
-                      {animeRecommendations.map((rec, index) => (
-                        <li
-                          key={`${rec.mal_id}-${index}`}
-                          ref={index === animeRecommendations.length - 1 ? animeLastElementRef : null}
-                          className="flex items-center space-x-3"
-                        >
+                <div className="relative h-[400px] overflow-hidden rounded-lg">
+                  <Marquee pauseOnHover vertical className="[--duration:100s]">
+                    {animeRecommendations.map((rec, index) => (
+                      <div key={`${rec.mal_id}-${index}`} className="p-2">
+                        <div className="flex items-center space-x-3">
                           <Avatar className="w-12 h-12">
                             <AvatarImage src={rec.entry[0].images.jpg.image_url} alt={rec.entry[0].title} />
                             <AvatarFallback>{rec.entry[0].title.slice(0, 2)}</AvatarFallback>
@@ -169,16 +143,13 @@ const ExplorePage = () => {
                             <p className="text-sm font-medium">{rec.entry[0].title}</p>
                             <p className="text-xs text-muted-foreground">Anime</p>
                           </div>
-                        </li>
-                      ))}
-                      {hasMoreAnime && (
-                        <li className="flex justify-center">
-                          <Loader2 className="w-6 h-6 animate-spin" />
-                        </li>
-                      )}
-                    </ul>
-                  )}
-                </ScrollArea>
+                        </div>
+                      </div>
+                    ))}
+                  </Marquee>
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white dark:from-background"></div>
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white dark:from-background"></div>
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -189,41 +160,27 @@ const ExplorePage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-[400px] pr-4">
-                  {isLoading ? (
-                    <div className="space-y-2">
-                      {[...Array(5)].map((_, index) => (
-                        <div key={index} className="h-16 bg-gray-200 rounded animate-pulse" />
-                      ))}
-                    </div>
-                  ) : error ? (
-                    <p className="text-red-500 text-sm">{error}</p>
-                  ) : (
-                    <ul className="space-y-4">
-                      {mangaRecommendations.map((rec, index) => (
-                        <li
-                          key={`${rec.mal_id}-${index}`}
-                          ref={index === mangaRecommendations.length - 1 ? mangaLastElementRef : null}
-                          className="flex items-center space-x-3"
-                        >
-                          <Avatar className="w-12 h-12">
-                            <AvatarImage src={rec.entry[0].images.jpg.image_url} alt={rec.entry[0].title} />
-                            <AvatarFallback>{rec.entry[0].title.slice(0, 2)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium">{rec.entry[0].title}</p>
-                            <p className="text-xs text-muted-foreground">Manga</p>
-                          </div>
-                        </li>
-                      ))}
-                      {hasMoreManga && (
-                        <li className="flex justify-center">
-                          <Loader2 className="w-6 h-6 animate-spin" />
-                        </li>
-                      )}
-                    </ul>
-                  )}
-                </ScrollArea>
+                <div className="relative flex h-[400px] w-full overflow-hidden rounded-lg [perspective:300px]">
+                  <Marquee
+                    vertical
+                    className="h-full justify-center overflow-hidden [--duration:200s] [--gap:1rem]"
+                    style={{
+                      transform: 'translateX(0px) translateY(0px) translateZ(-50px) rotateX(0deg) rotateY(-20deg) rotateZ(10deg) scale(1.5)',
+                    }}
+                  >
+                    {mangaRecommendations.map((rec, index) => (
+                      <div key={`${rec.mal_id}-${index}`} className="p-2">
+                        <img
+                          src={rec.entry[0].images.jpg.image_url}
+                          alt={rec.entry[0].title}
+                          className="h-40 w-28 rounded-lg object-cover shadow-md"
+                        />
+                      </div>
+                    ))}
+                  </Marquee>
+                  <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white dark:from-background"></div>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white dark:from-background"></div>
+                </div>
               </CardContent>
             </Card>
             <Card>

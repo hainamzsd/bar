@@ -24,12 +24,13 @@ interface ProfileHeaderProps {
     imageUrl: string;
     username: string;
     backgroundUrl: string | undefined;
-  }
+  };
+  isOwner: boolean;
 }
 
 import { PuffLoader } from 'react-spinners';
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, isOwner }) => {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(user.backgroundUrl || null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
@@ -41,7 +42,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const { updateUserInfo, user: currentUser } = useUserContext();
-  console.log(user.accountId)
   const handleBackgroundUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -199,39 +199,45 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
                   alt="Ảnh nền hồ sơ"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute top-2 right-2 z-20">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline">
-                        <Camera className="mr-2 h-4 w-4" /> Thay đổi ảnh nền
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => document.getElementById('background-upload')?.click()}>
-                        Tải ảnh mới
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleReposition}>
-                        Đặt lại vị trí
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                {isOwner && (
+                  <div className="absolute top-2 right-2 z-20">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                          <Camera className="mr-2 h-4 w-4" /> Thay đổi ảnh nền
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => document.getElementById('background-upload')?.click()}>
+                          Tải ảnh mới
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleReposition}>
+                          Đặt lại vị trí
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                )}
               </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
-                <Button variant="outline" onClick={() => document.getElementById('background-upload')?.click()}>
-                  <Camera className="mr-2 h-4 w-4" /> Tải lên ảnh nền
-                </Button>
+                {isOwner && (
+                  <Button variant="outline" onClick={() => document.getElementById('background-upload')?.click()}>
+                    <Camera className="mr-2 h-4 w-4" /> Tải lên ảnh nền
+                  </Button>
+                )}
               </div>
             )}
-            <input
-              id="background-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleBackgroundUpload}
-            />
+            {isOwner && (
+              <input
+                id="background-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleBackgroundUpload}
+              />
+            )}
           </>
         )}
       </div>
@@ -247,20 +253,24 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
               {user.username.split(' ').map((n) => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <label htmlFor="avatar-upload" className="cursor-pointer">
-              <div className="absolute bottom-1 right-4 bg-primary text-primary-foreground rounded-full p-2">
-                <Edit2 className="h-4 w-4" />
-              </div>
-            </label>
-          </div>
-          <input
-            id="avatar-upload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleAvatarUpload}
-          />
+          {isOwner && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <label htmlFor="avatar-upload" className="cursor-pointer">
+                <div className="absolute bottom-1 right-4 bg-primary text-primary-foreground rounded-full p-2">
+                  <Edit2 className="h-4 w-4" />
+                </div>
+              </label>
+            </div>
+          )}
+          {isOwner && (
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
+          )}
         </div>
       </div>
     </div>

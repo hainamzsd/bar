@@ -8,6 +8,7 @@ import { Input } from '../ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { Separator } from '../ui/separator'
 import { Skeleton } from '../ui/skeleton'
+import Link from 'next/link'
 
 interface SearchComponentProps {
     isOpen: boolean
@@ -59,13 +60,14 @@ const DesktopSearchComponent: React.FC<SearchComponentProps> = ({ isOpen, onClos
               <>
                 <h3 className="text-sm font-semibold mb-2">Người dùng</h3>
                 {users.documents.map((user) => (
+                  <Link href={`profile/${user.$id}`} key={user.id}>
                   <div key={user.id} className="flex items-center mb-2">
                     <Avatar className="h-8 w-8 mr-2">
                       <AvatarImage src={user.imageUrl} />
                       <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <span>{user.username}</span>
-                  </div>
+                  </div></Link>
                 ))}
               </>
             ) : (

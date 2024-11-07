@@ -4,7 +4,7 @@ import {
     useQueryClient,
     useInfiniteQuery
 } from '@tanstack/react-query'
-import { createUserAccount, getMentions, getMiniProfile, getUserByAccountId, searchUserByUsername, signInAccount, signInFacebook, signOutAccount, updateUser } from '../appwrite/api'
+import { createUserAccount, getMentions, getMiniProfile, getUserByAccountId, getUserById, searchUserByUsername, signInAccount, signInFacebook, signOutAccount, updateUser } from '../appwrite/api'
 import { INewUser, IUser } from '@/types'
 import { MentionFromAPI } from '@/types/mention'
 
@@ -86,7 +86,12 @@ export const useSignInFacebook = () => {
         mutationFn: signInFacebook,
     });
 };
-
+export const useGetUserById = (userId: string) => {
+  return useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => getUserById(userId)
+  });
+};
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
 

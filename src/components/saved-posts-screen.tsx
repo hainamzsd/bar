@@ -7,12 +7,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Bookmark, ExternalLink, ExternalLinkIcon, Heart, ImageIcon, MessageCircle, SendIcon, Share, Share2, X } from 'lucide-react'
+import { Bookmark, ExternalLink, Heart, ImageIcon, MessageCircle, Share2 } from 'lucide-react'
 import { useGetUserSavedPosts, useUnsavePost } from '@/lib/react-query/savePostQueriesAndMutations'
 import { useHasUserLikedPost, useGetPostLikesCount, useLikePost, useUnlikePost } from '@/lib/react-query/likeQueriesAndMutations'
 import { useUserContext } from '@/context/AuthContext'
 import { PostFromAPI } from '@/types/post'
-import { IUser } from '@/types'
 import { useCommentCount } from '@/lib/react-query/commentQueriesAndMutations'
 import { useGetPostSharesCount } from '@/lib/react-query/shareQueiresAndMutations'
 import Link from 'next/link'
@@ -61,6 +60,11 @@ function SavedPostCard({ post, userId, unsaveMutation }: { post: PostFromAPI, us
 
   const handleUnsave = () => {
     unsaveMutation.mutate({ userId, postId: post.$id })
+  }
+
+  // Check if post or post.creator is undefined
+  if (!post || !post.creator) {
+    return null; // or return a placeholder component
   }
 
   return (
@@ -115,7 +119,7 @@ function SavedPostCard({ post, userId, unsaveMutation }: { post: PostFromAPI, us
             <Link href={`/dashboard/post/${post.$id}`} className="group mb-4">
               <h2 className="text-xl font-bold flex items-center gap-2 hover:text-blue-500 transition-colors">
                 {post.caption}
-                <ExternalLinkIcon className="h-4 w-4 transition-opacity" />
+                <ExternalLink className="h-4 w-4 transition-opacity" />
               </h2>
             </Link>
             <PostImage imageUrl={post.imageUrl} caption={post.caption} className="w-full h-64 rounded-md mb-4" />

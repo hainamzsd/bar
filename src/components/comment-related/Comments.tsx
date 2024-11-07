@@ -34,7 +34,6 @@ function Comment({ comment, isReply = false }: { comment: CommentFromAPI; isRepl
   }
 
   const totalReplies = replies.length
-  console.log(comment.creator)
   return (
     <div className={`w-full bg-card text-card-foreground rounded-lg ${isReply ? 'ml-8 mt-2' : ''}`}>
       <div className="">

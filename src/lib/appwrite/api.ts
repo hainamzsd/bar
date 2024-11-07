@@ -153,6 +153,20 @@ export async function signInFacebook() {
         
     }
 }
+export async function getUserById(userId: string){
+  try {
+    const user = await databases.getDocument(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.userCollectionId as string,
+      userId
+    );
+
+    return user;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+}
 
 export async function getUserByAccountId(accountId:string) {
     try {

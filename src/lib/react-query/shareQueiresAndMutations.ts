@@ -11,8 +11,8 @@ export const useSharePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, postId, comment }: { userId: string, postId: string, comment?: string }) => 
-      sharePost(userId, postId, comment),
+    mutationFn: ({ userId, postId, authorId, comment }: { userId: string, postId: string, authorId:string,comment?: string }) => 
+      sharePost(userId, postId,authorId,comment),
     onSuccess: (newShare: IShare) => {
       queryClient.invalidateQueries({ queryKey: ['postShares', newShare.post] });
       queryClient.invalidateQueries({ queryKey: ['userShares', newShare.user] });

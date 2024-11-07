@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IPost } from '@/types';
 import { 
   createPost, 
@@ -68,9 +68,14 @@ export const useGetPostById = (postId: string) => {
 
 // Hook to fetch all posts
 export const useGetAllPosts = () => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['posts'],
-    queryFn: () => getAllPosts()
+    queryFn: ({ pageParam = 0 }) => getAllPosts(pageParam),
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length === 0) return undefined;
+      return allPages.length;
+    },
+    initialPageParam: 0,
   });
 };
 export const useUploadMedia = () => {
@@ -92,6 +97,7 @@ export const useGetPostsByUserId = (userId: string) => {
         caption: doc.caption,
         content: doc.content,
         creator: {
+          $id: doc.creator.$id,
           accountId: doc.creator.accountId,
           username: doc.creator.username,
           email: doc.creator.email,

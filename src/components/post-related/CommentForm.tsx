@@ -34,9 +34,10 @@ interface CommentFormProps {
   parentId?: string | null;
   formId: string;
   postId: string;
+  postAuthorId:string;
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postId }) => {
+const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postId,postAuthorId }) => {
   const [commentImage, setCommentImage] = useState<File | null>(null)
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -81,7 +82,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    form.setValue("content", value);
+    form.setValue("content", value, { shouldValidate: true });
     const lastWord = value.split(/\s/).pop() || "";
     if (lastWord.startsWith('@') && lastWord.length > 1) {
       setMentionQuery(lastWord.slice(1));
@@ -119,7 +120,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
       });
       return;
     }
-
+    console.log("created postAUthoridID" + postAuthorId)
     try {
       const comment = await createCommentMutation.mutateAsync({
         comment: {
@@ -129,6 +130,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
           parentId: parentId || undefined,
           level: parentId ? 1 : 0,
         },
+        postAuthorId: postAuthorId,
         mediaFile: commentImage || undefined,
       });
 
@@ -282,7 +284,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ user, parentId, formId, postI
               <Button
                 type="submit"
                 size={'icon'}
-                disabled={createCommentMutation.isPending || (!form.getValues('content') && !commentImage)}
+                disabled={createCommentMutation.isPending || !form.watch('content')}
               >
                 {createCommentMutation.isPending ? (
                   <div className="flex items-center justify-center space-x-2">

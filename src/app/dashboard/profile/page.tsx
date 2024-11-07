@@ -29,6 +29,8 @@ import { PuffLoader } from 'react-spinners'
 import { updateUserBio } from '@/lib/appwrite/api'
 import { useGetPostsByUserId } from '@/lib/react-query/postQueriesAndMutations'
 import PostSkeleton from '@/components/skeleton/post-skeleton'
+import { useGetUserShares } from '@/lib/react-query/shareQueiresAndMutations'
+import ShareCard from '@/components/ShareCard'
 
 
 export default function ProfileLayout() {
@@ -36,11 +38,11 @@ export default function ProfileLayout() {
   const [isEditing, setIsEditing] = useState(false)
   const [showFollowersModal, setShowFollowersModal] = useState(false)
   const [showFollowingModal, setShowFollowingModal] = useState(false)
-  const { user, setUser } = useUserContext();
+  const { user, updateUserInfo } = useUserContext();
   const { data: posts, isPending: isPostsPending, isError: isPostsError } = useGetPostsByUserId(user.accountId);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bio, setBio] = useState(user.bio || '');
-
+  const { data: shares, isPending: isSharesPending, isError: isSharesError } = useGetUserShares(user.accountId);
   const { data: followerCount = 0 } = useGetFollowerCount(user.accountId)
   const { data: followingCount = 0 } = useGetFollowingCount(user.accountId)
 
@@ -51,7 +53,7 @@ export default function ProfileLayout() {
     try {
       // Implement saving logic here
       const updatedUser = await updateUserBio(user.accountId, bio);
-      setUser(updatedUser as any);
+      updateUserInfo(updatedUser as any);
       setIsEditingBio(false);
     } catch (error) {
       console.error("Error updating bio:", error);
@@ -69,6 +71,7 @@ export default function ProfileLayout() {
           backgroundUrl: user.backgroundUrl,
           accountId: user.accountId
         }}
+        isOwner={true}
         ></ProfileHeader>
         <CardContent className="pt-24">
           <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-4">
@@ -188,26 +191,66 @@ export default function ProfileLayout() {
             </TabsContent>
           </Tabs>
           <Separator className="my-8" />
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Posts</h2>
-            <div className="space-y-4">
-              {isPostsPending ? (
-                <>
-                  {[...Array(5)].map((_, index) => (
-                    <PostSkeleton key={index} />
-                  ))}
-                </>
-              ) : isPostsError ? (
-                <p className="text-red-500">Lỗi khi tải bài viết. Vui lòng thử lại sau.</p>
-              ) : (
-                <>
-                  {posts?.map((post) => (
-                    <PostCard key={post.$id} post={post as any} />
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
+          <Tabs defaultValue="posts" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger
+                value="posts"
+                className="flex items-center justify-center space-x-2 md:space-x-0 md:justify-center"
+              >
+                <div className="hidden md:block">Bài viết</div>
+                <div className="block md:hidden">
+                  <User className="h-5 w-5" />
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="shares"
+                className="flex items-center justify-center space-x-2 md:space-x-0 md:justify-center"
+              >
+                <div className="hidden md:block">Chia sẻ</div>
+                <div className="block md:hidden">
+                  <Users className="h-5 w-5" />
+                </div>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="posts">
+              <div className="space-y-4">
+                {isPostsPending ? (
+                  <>
+                    {[...Array(5)].map((_, index) => (
+                      <PostSkeleton key={index} />
+                    ))}
+                  </>
+                ) : isPostsError ? (
+                  <p className="text-red-500">Lỗi khi tải bài viết. Vui lòng thử lại sau.</p>
+                ) : (
+                  <>
+                    {posts?.map((post) => (
+                      <PostCard key={post.$id} post={post as any} />
+                    ))}
+                  </>
+                )}
+              </div>
+            </TabsContent>
+            <TabsContent value="shares">
+              <div className="space-y-4">
+                {isSharesPending ? (
+                  <>
+                    {[...Array(5)].map((_, index) => (
+                      <PostSkeleton key={index} />
+                    ))}
+                  </>
+                ) : isSharesError ? (
+                  <p className="text-red-500">Lỗi khi tải chia sẻ. Vui lòng thử lại sau.</p>
+                ) : (
+                  <>
+                    {shares?.map((share) => (
+                      <ShareCard key={share.$id} share={share} currentUserId={user.accountId} />
+                    ))}
+                  </>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

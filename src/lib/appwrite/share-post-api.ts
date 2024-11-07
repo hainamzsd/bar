@@ -1,8 +1,11 @@
 import { ID, Query } from 'appwrite';
 import { databases, appwriteConfig } from './config';
 import { IShare } from '@/types';
+import { createNotification } from './notification-api';
+import { getUserByAccountId } from './api';
+import { getDynamicUrl } from '../utils';
 
-export async function sharePost(userId: string, postId: string, comment?: string): Promise<IShare> {
+export async function sharePost(userId: string, postId: string, authorId :string,comment?: string, ): Promise<IShare> {
   try {
     const share = await databases.createDocument(
       appwriteConfig.databaseId as string,
@@ -14,7 +17,14 @@ export async function sharePost(userId: string, postId: string, comment?: string
         comment: comment || '',
       }
     );
-
+    await createNotification({
+      userId: authorId,
+      type: 'share',
+      relatedId: getDynamicUrl(`/dashboard/post/${postId}`),
+      content: `Bài viết của bạn đã được chia sẻ.`,
+      isRead: false,
+      sender: userId
+    });
     return share as any;
   } catch (error) {
     console.error("Error sharing post:", error);

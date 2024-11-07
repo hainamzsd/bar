@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Link from 'next/link'
 
 type PostHeaderProps = {
   date: string;
@@ -24,16 +25,18 @@ type PostHeaderProps = {
 
 export default function PostHeader({date, username, avatar, creatorId, onEdit, onDelete}: PostHeaderProps) {
   const { user } = useUserContext();
-  console.log(creatorId)
-  console.log("current user" + user.accountId )
   return (
+
     <CardHeader className="flex flex-row items-center gap-4">
       <Avatar className="rounded-full">
         <AvatarImage src={avatar} alt="User avatar" />
         <AvatarFallback>UN</AvatarFallback>
       </Avatar>
       <div className="flex flex-col">
+    <Link href={`/dashboard/profile/${creatorId}`}>
         <p className="text-sm font-semibold">{username}</p>
+    </Link>
+
         <p className="text-xs text-muted-foreground">{formatTimeDifference(date)}</p>
       </div>
       {user.accountId === creatorId && (
@@ -57,5 +60,6 @@ export default function PostHeader({date, username, avatar, creatorId, onEdit, o
         </DropdownMenu>
       )}
     </CardHeader>
+
   )
 }

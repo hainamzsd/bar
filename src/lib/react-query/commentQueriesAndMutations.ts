@@ -6,9 +6,9 @@ import { CommentFromAPI } from '@/types/comment';
 // Hook to create a comment
 export const useCreateComment = () => {
   return useMutation({
-    mutationFn: ({ comment, mediaFile }:
-       { comment: IComment, mediaFile?: File }) => 
-      addComment(comment,mediaFile),
+    mutationFn: ({ comment, postAuthorId,mediaFile }:
+       { comment: IComment, postAuthorId:string, mediaFile?: File }) => 
+      addComment(comment, postAuthorId ,mediaFile),
     onSuccess: () => {
       // Optionally, invalidate queries or handle success UI
       

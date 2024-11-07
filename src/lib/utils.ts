@@ -34,7 +34,15 @@ export function cn(...inputs: ClassValue[]) {
     return `${seconds} giây trước`;
   }
 }
-
+export function getDynamicUrl(path: string): string {
+  // Use an environment variable for the base URL
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  
+  // Ensure the path starts with a slash
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  
+  return `${baseUrl}${normalizedPath}`;
+}
 export function extractMentions(content: string): string[] {
   const mentionRegex = /@(\w+)/g;
   const matches = content.match(mentionRegex);

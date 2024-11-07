@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { Skeleton } from '../ui/skeleton'
 import { PostFromAPI } from '@/types/post'
 import { useSearchPostsByTitle } from '@/lib/react-query/postQueriesAndMutations'
+import Link from 'next/link'
 
 interface SearchComponentProps {
   isOpen: boolean
@@ -70,6 +71,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ isOpen, onClose, onSe
                   <>
               <h3 className="text-sm font-semibold mb-2">Người dùng</h3>
                   
+                  <Link href={`profile/${user.$id}`} key={user.id}>
                   <div key={user.id} className="flex items-center mb-2">
                     <Avatar className="h-8 w-8 mr-2">
                       <AvatarImage src={user.imageUrl} />
@@ -77,6 +79,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ isOpen, onClose, onSe
                     </Avatar>
                     <span>{user.username}</span>
                   </div>
+                  </Link>
                   </>
 
                 ))

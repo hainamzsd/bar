@@ -123,9 +123,10 @@ export const useIsFollowing = (followedId: string, followerId: string) => {
   return useQuery({
     queryKey: ['isFollowing', followedId, followerId],
     queryFn: () => isFollowing(followedId, followerId),
-    enabled: !!followedId && !!followerId,
+    enabled: Boolean(followedId) && Boolean(followerId),
   });
 };
+
 
 // Hook to get the follower count for a user
 export const useGetFollowerCount = (userId: string) => {
