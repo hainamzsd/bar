@@ -123,15 +123,15 @@ const MP3Player = () => {
       <div className="flex items-center justify-between h-16 sm:h-20">
         <div className="flex items-center space-x-4">
           <div className="relative w-12 h-12 rounded-lg overflow-hidden hidden sm:block">
-            <Image
-              src="/placeholder.svg?height=300&width=300"
+            <img
+              src="https://i.ytimg.com/vi/QZr8rhp5y7s/hqdefault.jpg"
               alt="Album cover"
-              layout="fill"
-              objectFit="cover"
+              // layout="fill"
+              // objectFit="cover"
             />
           </div>
           <div>
-            <h3 className="text-sm font-medium">Song Title</h3>
+            <h3 className="text-sm font-medium">Cà phê ^-^</h3>
             {/* <p className="text-xs text-muted-foreground">Artist Name</p> */}
           </div>
         </div>
@@ -168,7 +168,7 @@ const MP3Player = () => {
       <div className={`space-y-4 pb-4 ${isExpanded ? 'block' : 'hidden sm:block'}`}>
         <audio
           ref={audioElementRef}
-          src="/mgs.mp3"
+          src="/coffee.mp3"
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={() => !isRepeat && setIsPlaying(false)}

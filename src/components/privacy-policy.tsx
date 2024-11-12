@@ -38,7 +38,7 @@ export function PrivacyPolicyComponent() {
               <h3 className="text-lg font-semibold mb-2">Định nghĩa</h3>
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>Tài khoản</strong>: Tài khoản duy nhất được tạo cho Bạn để truy cập Dịch vụ của chúng tôi.</li>
-                <li><strong>Công ty</strong>: Bar Of Otaku (được gọi là "Công ty", "Chúng tôi", "Chúng ta" hoặc "Của chúng tôi" trong Thỏa thuận này).</li>
+                <li><strong>Công ty</strong>: Bar Of Otaku (được gọi là &quot;Công ty&quot;, &quot;Chúng tôi&quot;, &quot;Chúng ta&quot; hoặc &quot;Của chúng tôi&quot; trong Thỏa thuận này).</li>
                 <li><strong>Cookie</strong>: Tệp nhỏ được đặt trên thiết bị của Bạn bởi một trang web.</li>
                 <li><strong>Quốc gia</strong>: Việt Nam</li>
                 <li><strong>Thiết bị</strong>: Bất kỳ thiết bị nào có thể truy cập Dịch vụ.</li>

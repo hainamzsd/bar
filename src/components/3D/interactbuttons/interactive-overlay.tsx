@@ -34,7 +34,7 @@ export function InteractiveOverlayComponent() {
 
   return (
     <div className="absolute inset-0 pointer-events-none">
-      <div className="absolute top-24 right-4 md:top-10 md:right-7 pointer-events-auto">
+      <div className="absolute top-24 right-4 pointer-events-auto">
         <CircularMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} menuItems={menuItems} />
       </div>
 
