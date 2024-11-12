@@ -5,11 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { ChevronDown } from "lucide-react"
-import { DialogContent } from '../ui/dialog'
+import { DialogContent } from '@/components/ui/dialog'
+import { AnimeDrinkModal } from './anime-drink-modal'
 
 const menuCategories = [
   {
-    name: "Coffee",
+    name: "Cà phê",
     items: [
       { name: "Espresso", price: 30000 },
       { name: "Cappuccino", price: 45000 },
@@ -17,24 +18,16 @@ const menuCategories = [
     ]
   },
   {
-    name: "Tea",
+    name: "Trà",
     items: [
       { name: "Matcha Latte", price: 55000 },
-      { name: "Earl Grey", price: 40000 },
-      { name: "Jasmine Green", price: 35000 },
-    ]
+      { name: "Matcha", price: 55000 },
+    ],
   },
-  {
-    name: "Specials",
-    items: [
-      { name: "Sakura Blossom Frappe", price: 65000 },
-      { name: "Yuzu Citrus Sparkler", price: 60000 },
-      { name: "Hojicha Cream Cold Brew", price: 70000 },
-    ]
-  }
+  
 ]
 
-const MenuItem = ({ item }: { item: { name: string; price: number } }) => (
+const MenuItem = ({ item, onOrder }: { item: { name: string; price: number }, onOrder: (name: string) => void }) => (
   <motion.div 
     className="flex justify-between items-center py-2"
     initial={{ opacity: 0, y: 20 }}
@@ -43,11 +36,14 @@ const MenuItem = ({ item }: { item: { name: string; price: number } }) => (
     transition={{ duration: 0.3 }}
   >
     <span className="text-lg font-medium">{item.name}</span>
-    <span className="text-lg font-light">{item.price.toLocaleString()} ₫</span>
+    <div className="flex items-center">
+      {/* <span className="text-lg font-light mr-2">0 cá</span> */}
+      <Button variant="outline" size="sm" onClick={() => onOrder(item.name)}>Đặt</Button>
+    </div>
   </motion.div>
 )
 
-const MenuCategory = ({ category }: { category: { name: string; items: { name: string; price: number }[] } }) => {
+const MenuCategory = ({ category, onOrder }: { category: { name: string; items: { name: string; price: number }[] }, onOrder: (name: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -69,7 +65,7 @@ const MenuCategory = ({ category }: { category: { name: string; items: { name: s
             transition={{ duration: 0.3 }}
           >
             {category.items.map((item) => (
-              <MenuItem key={item.name} item={item} />
+              <MenuItem key={item.name} item={item} onOrder={onOrder} />
             ))}
           </motion.div>
         )}
@@ -80,19 +76,35 @@ const MenuCategory = ({ category }: { category: { name: string; items: { name: s
 }
 
 export function ElegantMenuComponent() {
+  const [selectedDrink, setSelectedDrink] = useState<string | null>(null)
+
+  const handleOrder = (drinkName: string) => {
+    setSelectedDrink(drinkName)
+  }
+
+  const handleCloseModal = () => {
+    setSelectedDrink(null)
+  }
+
   return (
-    <DialogContent className="backdrop-blur-md p-8 rounded-lg shadow-lg 
-     max-w-80 md:max-w-lg mx-auto font-sans" >
-      <h2 className="text-3xl font-bold mb-6 text-center ">Café Menu</h2>
+    <DialogContent className="backdrop-blur-md p-8 rounded-lg shadow-lg max-w-80 md:max-w-lg mx-auto font-sans">
+      <h2 className="text-3xl font-bold mb-6 text-center">Café Menu</h2>
       <div className="space-y-6 max-h-80 overflow-auto">
         {menuCategories.map((category) => (
-          <MenuCategory key={category.name} category={category} />
+          <MenuCategory key={category.name} category={category} onOrder={handleOrder} />
         ))}
       </div>
       <div className="mt-8 text-center text-sm text-gray-500">
-        <p>All prices are in Vietnamese Dong (₫)</p>
-        <p className="mt-2">Enjoy your stay at our anime-inspired café!</p>
+        <p>^-^ xin cảm ơn</p>
+        <p className="mt-2">Enjoy your stay at our bar of otaku!</p>
       </div>
+      {selectedDrink && (
+        <AnimeDrinkModal
+          isOpen={!!selectedDrink}
+          onClose={handleCloseModal}
+          drinkName={selectedDrink}
+        />
+      )}
     </DialogContent>
   )
 }

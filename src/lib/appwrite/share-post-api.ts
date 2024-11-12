@@ -17,14 +17,16 @@ export async function sharePost(userId: string, postId: string, authorId :string
         comment: comment || '',
       }
     );
-    await createNotification({
-      userId: authorId,
-      type: 'share',
-      relatedId: getDynamicUrl(`/dashboard/post/${postId}`),
-      content: `Bài viết của bạn đã được chia sẻ.`,
-      isRead: false,
-      sender: userId
-    });
+    if(authorId !== userId){
+      await createNotification({
+        userId: authorId,
+        type: 'share',
+        relatedId: getDynamicUrl(`/dashboard/post/${postId}`),
+        content: `Bài viết của bạn đã được chia sẻ.`,
+        isRead: false,
+        sender: userId
+      });
+    }
     return share as any;
   } catch (error) {
     console.error("Error sharing post:", error);

@@ -73,7 +73,7 @@ export type INavLink = {
     content: string;            // Notification content
     userId: string;             // ID of the user who is notified (relationship with user)
     isRead: boolean;            // Whether the notification has been read
-    type: 'like' | 'comment' | 'follow' | 'share' | 'save' | 'reply'; // Type of notification (enum)
+    type: 'like' | 'comment' | 'follow' | 'share' | 'save' | 'reply' | 'mention'; // Type of notification (enum)
     sender:string;
   };
 

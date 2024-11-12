@@ -27,8 +27,8 @@ const menuItemVariants = {
     scale: 0,
   },
   visible: (index: number) => ({
-    x: Math.cos((index * (2 * Math.PI)) / 3) * 80,
-    y: Math.sin((index * (2 * Math.PI)) / 3) * 80,
+    x: 0,
+    y: (index + 1) * 60,
     opacity: 1,
     scale: 1,
     transition: { type: "spring", stiffness: 300, damping: 20 },
@@ -60,11 +60,14 @@ export function CircularMenu({ isOpen, setIsOpen, menuItems }: CircularMenuProps
       variants={menuContainerVariants}
       initial="closed"
       animate={isOpen ? "open" : "closed"}
-      className="relative w-48 h-48 rounded-full flex items-center justify-center"
+      className="relative w-12"
+      style={{ height: isOpen ? `${(menuItems.length + 1) * 30}px` : '20px' }}
     >
       <Button
         className="z-10 size-12 p-2 flex items-center justify-center cursor-pointer bg-primary text-primary-foreground rounded-full"
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-label="Toggle menu"
       >
         <Menu className="h-6 w-6" />
       </Button>
@@ -72,18 +75,19 @@ export function CircularMenu({ isOpen, setIsOpen, menuItems }: CircularMenuProps
       <AnimatePresence>
         {isOpen &&
           menuItems.map((item, index) => (
-            <motion.div
+            <motion.button
               key={index}
-              className="absolute w-12 h-12 bg-primary text-primary-foreground flex items-center justify-center rounded-full"
+              className="absolute left-0 top-3 w-12 h-12 bg-primary text-primary-foreground flex items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               custom={index}
               variants={menuItemVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
               onClick={item.action}
+              aria-label={item.name}
             >
               {item.icon}
-            </motion.div>
+            </motion.button>
           ))}
       </AnimatePresence>
     </motion.div>

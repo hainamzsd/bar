@@ -37,7 +37,7 @@ const FollowingModal: React.FC<FollowingModalProps> = ({ showFollowingModal, set
         <DialogHeader>
           <DialogTitle>Đang theo dõi</DialogTitle>
         </DialogHeader>
-        {isLoading ? (
+        {isLoading || !following ? (
           <div className="text-center">Đang tải...</div>
         ) : following?.length === 0 ? (
           <div className="text-center text-gray-500">
@@ -45,7 +45,7 @@ const FollowingModal: React.FC<FollowingModalProps> = ({ showFollowingModal, set
           </div>
         ) : (
           <div className="space-y-4">
-            {following?.map((user: any) => (
+            {following.map((user: any) => (
               <div key={user.$id} className="flex items-center justify-between space-x-4">
                 <div className="flex items-center space-x-4">
                   <Avatar>

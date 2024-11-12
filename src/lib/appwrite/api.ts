@@ -29,6 +29,18 @@ export async function createUserAccount(user: INewUser){
         return error;
     }
 }
+
+
+
+
+export async function fetchImages({ pageParam = '' }) {
+  const response = await fetch(`/api/images?cursor=${pageParam}`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
 export async function uploadMedia(file: File): Promise<{ imageUrl: URL; imageId: string } | null> {
     try {
       const uploadedFile = await storage.createFile(
@@ -75,27 +87,36 @@ export async function saveUserToDB(user: IUser) {
     }
 }
 export async function updateUser(userId: string, userData: Partial<IUser>) {
-    try {
-        console.log('Updating user with ID:', userId);
+  try {
+      console.log('Updating user with ID:', userId);
 
-        // Filter out the accountId field from userData
-        const { accountId, ...filteredUserData } = userData;
+      // Ensure gender is correctly converted to boolean or null
+      let convertedGender: boolean | null = null;
+      if (userData.gender === 'Male' as any) {
+          convertedGender = true;
+      } else if (userData.gender === 'Female' as any) {
+          convertedGender = false;
+      }
 
-        const updatedUser = await databases.updateDocument(
-            appwriteConfig.databaseId as any,
-            appwriteConfig.userCollectionId as any,
-            userId,
-            filteredUserData // Use the filtered data
-        );
+      // Filter out the accountId field and update gender
+      const { accountId, ...filteredUserData } = userData;
 
-        if (!updatedUser) throw new Error('Failed to update user');
+      const updatedUser = await databases.updateDocument(
+          appwriteConfig.databaseId as any,
+          appwriteConfig.userCollectionId as any,
+          userId,
+          { ...filteredUserData, gender: convertedGender } // Use the filtered data with updated gender
+      );
 
-        return updatedUser;
-    } catch (error) {
-        console.error("Error updating user:", error);
-        throw error;
-    }
+      if (!updatedUser) throw new Error('Failed to update user');
+
+      return updatedUser;
+  } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
+  }
 }
+
 
 export async function deleteFile(fileId: string) {
     try {

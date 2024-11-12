@@ -22,9 +22,24 @@ export const useCreateComment = () => {
 
 export const useCreateReply = () => {
   return useMutation({
-    mutationFn: ({ parentComment, content, user,mediaFile }: 
-      { parentComment: CommentFromAPI, content: string, user: IUser,  mediaFile?: File}) => 
-      addReply(parentComment, content, user,mediaFile),
+    /**
+     * Creates a reply to the given parent comment. The reply's content will be
+     * sent to the server, as well as the user who is making the reply and the
+     * post author ID.
+     * 
+     * @param {CommentFromAPI} parentComment The parent comment to which this
+     * reply is being made.
+     * @param {string} content The content of the reply.
+     * @param {IUser} user The user who is making the reply.
+     * @param {string} postAuthorId The ID of the author of the post to which
+     * this comment is being replied.
+     * @param {File} [mediaFile] An optional file to upload. If provided, the
+     * file will be uploaded and the server will return the URL of the uploaded
+     * file.
+     */
+    mutationFn: ({ parentComment, content, user, postAuthorId,mediaFile }: 
+      { parentComment: CommentFromAPI, content: string, user: IUser, postAuthorId:string,mediaFile?: File}) => 
+      addReply(parentComment, content, user, postAuthorId,mediaFile),
     onSuccess: () => {
       // Optionally invalidate queries or update UI
       

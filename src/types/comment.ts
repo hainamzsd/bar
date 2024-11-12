@@ -13,7 +13,7 @@ import { PostFromAPI } from "./post";
         post: PostFromAPI;
         creator: {
             username: string;
-            id: string;
+            $id: string;
             email: string;
             bio: string | null;
             imageUrl: string;

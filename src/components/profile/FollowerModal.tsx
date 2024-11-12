@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Loader2, Users } from 'lucide-react'
 import { useFollowUser, useUnfollowUser, useIsFollowing, useGetFollowers } from '@/lib/react-query/followerQueriesAndMutations'
 import { useUserContext } from '@/context/AuthContext'
+import Link from 'next/link'
 
 interface FollowersModalProps {
   showFollowersModal: boolean
@@ -51,9 +52,9 @@ export default function FollowersModal({ showFollowersModal, setShowFollowersMod
           </div>
         ) : (
           <div className="space-y-4 max-h-96 overflow-y-auto">
-            {followers?.map((follower) => (
+            {followers?.map((follower: any) => (
               <FollowerItem
-                key={follower.accountId}
+                key={follower.$id}
                 follower={follower}
                 currentUserId={currentUser.accountId}
                 profileUserId={userId}
@@ -79,11 +80,12 @@ interface FollowerItemProps {
 }
 
 function FollowerItem({ follower, currentUserId, profileUserId, onFollowToggle, isFollowLoading, isUnfollowLoading }: FollowerItemProps) {
-  const { data: isFollowing } = useIsFollowing(currentUserId, follower.accountId)
+  const { data: isFollowing } = useIsFollowing(currentUserId, follower.$id)
 
-  const showFollowButton = currentUserId !== follower.accountId && follower.accountId !== profileUserId
+  const showFollowButton = currentUserId !== follower.$id && follower.$id !== profileUserId
 
   return (
+    <Link href={`/dashboard/profile/${follower.$id}`}>
     <div className="flex items-center justify-between space-x-4">
       <div className="flex items-center">
         <Avatar>
@@ -94,12 +96,12 @@ function FollowerItem({ follower, currentUserId, profileUserId, onFollowToggle, 
           <p className="font-semibold">{follower.username}</p>
         </div>
       </div>
-      {showFollowButton && (
+      {/* {showFollowButton && (
         <Button
           variant="outline"
           size="sm"
           className="ml-auto"
-          onClick={() => onFollowToggle(follower.accountId, isFollowing ?? false)}
+          onClick={() => onFollowToggle(follower.$id, isFollowing ?? false)}
           disabled={isFollowLoading || isUnfollowLoading}
         >
           {isFollowLoading || isUnfollowLoading ? (
@@ -110,7 +112,7 @@ function FollowerItem({ follower, currentUserId, profileUserId, onFollowToggle, 
             'Theo dõi'
           )}
         </Button>
-      )}
-    </div>
+      )} */}
+    </div></Link>
   )
 }

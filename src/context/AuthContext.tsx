@@ -93,6 +93,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             joinDate: currentAccount.$createdAt,
             dob: currentAccount.dob,
             backgroundUrl: currentAccount.backgroundUrl,
+            facebookLink: currentAccount.facebookLink,
+            twitterLink:currentAccount.twitterLink,
             isActive: true,
             role: 'customer'
           });

@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { DialogContent } from "@/components/ui/dialog"
 import { Slider } from "@/components/ui/slider"
-import { Play, Pause, Volume2, VolumeX } from "lucide-react"
+import { Play, Pause, Volume2, VolumeX, Repeat, Repeat1 as RepeatOne, ChevronUp, ChevronDown } from "lucide-react"
+import Image from "next/image"
 
 const MP3Player = () => {
   const [isPlaying, setIsPlaying] = useState(false)
@@ -13,6 +13,8 @@ const MP3Player = () => {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [audioData, setAudioData] = useState<number[]>(Array(30).fill(100))
+  const [isRepeat, setIsRepeat] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
@@ -108,17 +110,72 @@ const MP3Player = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
   }
 
+  const toggleRepeat = () => {
+    setIsRepeat(!isRepeat)
+    if (audioElementRef.current) {
+      audioElementRef.current.loop = !isRepeat
+    }
+  }
+
   return (
-    <DialogContent className="sm:max-w-[425px]">
-      <div className="flex flex-col items-center space-y-4">
+    <div className={`fixed bottom-0 left-0 pointer-events-auto right-0 bg-background border-t border-border shadow-lg transition-all duration-300 ease-in-out ${isExpanded ? 'h-auto' : 'h-16 sm:h-20'}`}>
+    <div className="container mx-auto px-4">
+      <div className="flex items-center justify-between h-16 sm:h-20">
+        <div className="flex items-center space-x-4">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden hidden sm:block">
+            <Image
+              src="/placeholder.svg?height=300&width=300"
+              alt="Album cover"
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
+          <div>
+            <h3 className="text-sm font-medium">Song Title</h3>
+            {/* <p className="text-xs text-muted-foreground">Artist Name</p> */}
+          </div>
+        </div>
+        <div className="flex-1 mx-4 h-8 flex items-center justify-center ">
+          <div className="w-full h-full flex items-end justify-center space-x-px">
+            {audioData.map((height, index) => (
+              <motion.div
+                key={index}
+                className="bg-primary w-1 rounded-t-sm"
+                animate={{
+                  height: `${height}%`,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button onClick={togglePlayPause} size="icon" variant="ghost">
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          </Button>
+          <Button onClick={toggleRepeat} size="icon" variant="ghost" className="hidden sm:inline-flex">
+            {isRepeat ? <RepeatOne className="h-4 w-4" /> : <Repeat className="h-4 w-4" />}
+          </Button>
+          <Button onClick={() => setIsExpanded(!isExpanded)} size="icon" variant="ghost" className="sm:hidden">
+            {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </Button>
+        </div>
+      </div>
+      <div className={`space-y-4 pb-4 ${isExpanded ? 'block' : 'hidden sm:block'}`}>
         <audio
           ref={audioElementRef}
           src="/mgs.mp3"
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
+          onEnded={() => !isRepeat && setIsPlaying(false)}
           onError={(e) => console.error("Audio error:", e)}
+          loop={isRepeat}
         />
-        <div className="flex items-end h-20 w-full justify-center">
+        {/* <div className="flex items-end h-16 w-full justify-center sm:block">
           {audioData.map((height, index) => (
             <motion.div
               key={index}
@@ -133,11 +190,8 @@ const MP3Player = () => {
               }}
             />
           ))}
-        </div>
+        </div> */}
         <div className="flex items-center space-x-2 w-full">
-          <Button onClick={togglePlayPause} size="icon" variant="ghost">
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          </Button>
           <Slider
             value={[currentTime]}
             max={duration}
@@ -164,7 +218,8 @@ const MP3Player = () => {
           />
         </div>
       </div>
-    </DialogContent>
+    </div>
+  </div>
   )
 }
 

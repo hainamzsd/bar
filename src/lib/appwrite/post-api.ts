@@ -1,7 +1,7 @@
   import { ID, Query } from 'appwrite';
   import { databases, appwriteConfig, storage } from './config';
   import { IPost } from '@/types';
-import { extractMentions } from '../utils';
+import { extractMentions, getDynamicUrl } from '../utils';
 import { MentionFromAPI } from '@/types/mention';
 import { createNotification } from './notification-api';
 import { getUserByAccountId } from './api';
@@ -71,13 +71,18 @@ import { getUserByAccountId } from './api';
               comment: content
             }
           );
-          const mentioningUser = await getUserByAccountId(creatorId);
+          console.log(mentionedUser.$id)
+          console.log(mentioningUserId)
+          console.log('hello')
+          // const mentioningUser = await getUserByAccountId(creatorId);
+         
           await createNotification({
-            userId: mentioningUserId,
-            type: 'reply',
-            relatedId:postId,
-            content: `Bạn đã ${mentioningUser.username} được nhắc đến trong 1 bài viết.`,
-            isRead: false
+            userId: mentionedUser.$id,
+            type: 'mention',
+            relatedId: getDynamicUrl(`/dashboard/post/${postId}`),
+            content: `Bạn đã được nhắc đến trong 1 bài viết.`,
+            isRead: false,
+            sender: mentioningUserId
           });
   
         } else {

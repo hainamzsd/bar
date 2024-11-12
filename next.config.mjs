@@ -10,6 +10,12 @@ const nextConfig = {
         },
         {
           protocol: 'https',
+          hostname: 'cloud.appwrite.io',
+          port: '',
+          pathname: '/images/**',
+        },
+        {
+          protocol: 'https',
           hostname: 'pic.re',
           port: '',
           pathname: '/images/**',

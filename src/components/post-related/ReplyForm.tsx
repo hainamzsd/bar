@@ -20,13 +20,14 @@ interface ReplyFormProps {
     user: IUser
   postId: string;
   formId: string;
+  postAuthorId:string;
 }
 const commentFormSchema = z.object({
     content: z.string().optional(),
   })
   
   type CommentFormValues = z.infer<typeof commentFormSchema>
-const ReplyForm: React.FC<ReplyFormProps> = ({ parentComment, user,postId,formId}) => {
+const ReplyForm: React.FC<ReplyFormProps> = ({ parentComment, user,postId,formId,postAuthorId}) => {
   const [commentImage, setCommentImage] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -55,6 +56,7 @@ const ReplyForm: React.FC<ReplyFormProps> = ({ parentComment, user,postId,formId
         parentComment: parentComment,
         content: values.content || '',
         user: user,
+        postAuthorId:postAuthorId,
         mediaFile:commentImage || undefined
       });
 
@@ -120,7 +122,7 @@ const ReplyForm: React.FC<ReplyFormProps> = ({ parentComment, user,postId,formId
                 <FormItem>
                   <FormControl>
                     <Textarea
-                      placeholder="Reply to the comment..."
+                      placeholder="Phản hồi bình luận..."
                       className="min-h-[60px]"
                       {...field}
                     />

@@ -39,7 +39,7 @@ export async function addComment(
       newComment
     );
     await createMentions(comment.post,savedComment.$id, comment.content ?? '', comment.creator, 'comment');
-    console.log(postAuthorId + "authorID")
+    if(postAuthorId !== comment.creator){
     await createNotification({
       userId: postAuthorId,
       type: 'comment',
@@ -47,7 +47,7 @@ export async function addComment(
       content: `Bài viết của bạn đã được bình luận.`,
       isRead: false,
       sender: comment.creator
-    });
+    });}
     if (!savedComment && uploadedFile) {
       await deleteFile(uploadedFile.$id);
       throw new Error('Error creating comment, image deleted');
@@ -64,6 +64,7 @@ export async function addReply(
   parentComment: CommentFromAPI,
   content: string, 
   user: IUser,
+  postAuthorId:string,
   mediaFile?: File
 ) {
   try {
@@ -96,13 +97,23 @@ export async function addReply(
       ID.unique(),
       newReply
     );
-
+  
     if (!savedReply && uploadedFile) {
       await deleteFile(uploadedFile.$id);
       throw new Error('Error creating reply, image deleted');
     }
 
     await createMentions(parentComment.post.$id ,savedReply.$id, content ?? '', user.accountId, 'reply');
+    if(parentComment.creator.$id !== user.accountId){
+      await createNotification({
+        userId: parentComment.creator.$id,
+        type: 'reply',
+        relatedId: getDynamicUrl(`/dashboard/post/${parentComment.post.$id}`),
+        content: `Bình luận của bạn đã được ${user.username} phản hồi.`,
+        isRead: false,
+        sender: user.accountId
+      });
+    }
     return savedReply;
   } catch (error) {
     console.error('Error adding reply:', error);

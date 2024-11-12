@@ -86,7 +86,7 @@ export default function ProfileLayout() {
                     <Edit className="mr-2 h-4 w-4" /> Sửa thông tin
                   </Button>
                 </DialogTrigger>
-                <ProfileEditForm user={user} />
+                <ProfileEditForm />
               </Dialog>
             </div>
           </div>

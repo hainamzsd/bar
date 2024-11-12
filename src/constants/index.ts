@@ -1,6 +1,7 @@
 import {
   Home, Expand, UsersRound, Bookmark, icons, LayoutList, ImagePlus, Newspaper,
-  Coffee, Scale, CircleHelp, Rabbit, Images
+  Coffee, Scale, CircleHelp, Rabbit, Images,
+  Archive
 } from 'lucide-react'
 
 export const mainNavigate = [
@@ -23,6 +24,11 @@ export const mainNavigate = [
     route: "/dashboard/people",
     label: "Mọi người",
     icon: UsersRound
+  },
+  {
+    route: "/dashboard/gallery",
+    label: "Triển lãm",
+    icon: Archive
   },
 ];
 
@@ -52,7 +58,7 @@ export const references = [
     icon: CircleHelp
   },
   {
-    route: "/",
+    route: "/dashboard/policy",
     label: "Các chính sách",
     icon: Scale
   },

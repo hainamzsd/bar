@@ -29,7 +29,7 @@ export default function CommentList({ postId }: { postId: string }) {
   };
 
   if (isLoading) {
-    return <div className="text-center">Loading comments...</div>;
+    return <div className="text-center">Đang tải bình luận...</div>;
   }
 
   return (

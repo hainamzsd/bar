@@ -34,22 +34,30 @@ const UserInfoCard: React.FC<{ userInfo: IUser }> = ({ userInfo }) => {
             <span>Giới tính: {genderToString(userInfo.gender)}</span>
           </div>
         </div>
-        {(userInfo.facebook && userInfo.twitter) && <>
+        {(userInfo.facebookLink && userInfo.twitterLink) && <>
             <Separator />
         <div>
           <h3 className="font-semibold mb-2">Mạng xã hội</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center space-x-2">
-              <Facebook className="h-5 w-5 text-muted-foreground" />
-              <a href={userInfo.facebook} className="text-blue-500 hover:underline">
-                {userInfo.facebook}
-              </a>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-2">
+                <Facebook className="h-5 w-5 text-muted-foreground" />
+                <div className="flex-1 overflow-hidden text-ellipsis">
+                  <a href={userInfo.facebookLink} className="text-blue-500 hover:underline">
+                    {userInfo.facebookLink}
+                  </a>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Twitter className="h-5 w-5 text-muted-foreground" />
-              <a href={userInfo.twitter} className="text-blue-500 hover:underline">
-                {userInfo.twitter}
-              </a>
+            <div className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-2">
+                <Twitter className="h-5 w-5 text-muted-foreground" />
+                <div className="flex-1 overflow-hidden text-ellipsis">
+                  <a href={userInfo.twitterLink} className="text-blue-500 hover:underline">
+                    {userInfo.twitterLink}
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

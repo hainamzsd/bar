@@ -13,7 +13,7 @@ export function InteractiveOverlayComponent() {
   const [isPuzzleOpen, setIsPuzzleOpen] = useState(false)
   const [isOrderOpen, setIsOrderOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isMusicOpen, setIsMusicOpen] = useState(false)
+  const [isMusicVisible, setIsMusicVisible] = useState(false)
   const [achievements, setAchievements] = useState([
     { name: "Puzzle Master", unlocked: false },
     { name: "First Order", unlocked: false },
@@ -29,12 +29,12 @@ export function InteractiveOverlayComponent() {
     { name: "Puzzle", icon: <Lock className="h-[1.2rem] w-[1.2rem]" />, action: () => setIsPuzzleOpen(true) },
     { name: "Coffee", icon: <Coffee className="h-[1.2rem] w-[1.2rem]" />, action: () => setIsOrderOpen(true) },
     { name: "Achievements", icon: <Trophy className="h-[1.2rem] w-[1.2rem]" />, action: () => achievementsTriggerRef.current?.click() },
-    { name: "Music", icon: <Music className="h-[1.2rem] w-[1.2rem]" />, action: () => setIsMusicOpen(true) },
+    { name: "Music", icon: <Music className="h-[1.2rem] w-[1.2rem]" />, action: () => setIsMusicVisible(!isMusicVisible) },
   ]
 
   return (
     <div className="absolute inset-0 pointer-events-none">
-      <div className="absolute bottom-10 right-7 pointer-events-auto">
+      <div className="absolute top-24 right-4 md:top-10 md:right-7 pointer-events-auto">
         <CircularMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} menuItems={menuItems} />
       </div>
 
@@ -46,9 +46,7 @@ export function InteractiveOverlayComponent() {
 
       <AchievementsDialog achievements={achievements} triggerRef={achievementsTriggerRef} />
 
-      <Dialog open={isMusicOpen} onOpenChange={setIsMusicOpen}>
-        <MP3Player />
-      </Dialog>
+      {isMusicVisible && <MP3Player />}
     </div>
   )
 }
