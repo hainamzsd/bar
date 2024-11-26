@@ -161,7 +161,7 @@ const SignInDialog = () => {
           </Button>
         </form>
       </Form>
-      <Button
+      {/* <Button
         onClick={handleFacebookLogin}
         variant="outline"
         className="w-full flex items-center justify-center"
@@ -184,7 +184,7 @@ const SignInDialog = () => {
             Đăng nhập bằng Facebook
           </>
         )}
-      </Button>
+      </Button> */}
     </div>
   );
 };

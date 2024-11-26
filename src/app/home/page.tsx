@@ -22,10 +22,10 @@ export default function Page() {
   const {toast} = useToast();
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-        toast({
-          variant:'destructive',
-          title:"Chưa đăng nhập"
-        })
+        // toast({
+        //   variant:'destructive',
+        //   title:"Chưa đăng nhập"
+        // })
         router.push('/'); // Redirect to homepage if not authenticated
     }
 }, [isAuthenticated, isLoading, router]);
