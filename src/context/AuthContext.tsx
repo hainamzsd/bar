@@ -61,20 +61,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const updatedUser = await updateUser(user.accountId, filteredData);
       if (updatedUser) {
         setUser({ ...user, ...updatedUser, accountId: user.accountId });
-        // toast({
-        //   title: 'Success',
-        //   description: 'Profile updated successfully',
-        // });
         return true;
       }
       return false;
     } catch (error) {
       console.error(error);
-      // toast({
-      //   title: 'Error',
-      //   description: 'Failed to update profile',
-      //   variant: 'destructive',
-      // });
       return false;
     }
   };
@@ -148,3 +139,4 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export default AuthProvider;
 
 export const useUserContext = () => useContext(AuthContext);
+

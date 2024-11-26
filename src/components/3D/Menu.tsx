@@ -23,12 +23,15 @@ import NotificationContent from '../notifications-content';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { getRoleTranslation } from '@/lib/utils';
+import { useGetUnreadNotificationCount } from '@/lib/react-query/notifyQueriesAndMutation';
 
 export default function Menu() {
   const { theme, setTheme } = useTheme()
+
   const router = useRouter();
   const [role, setRole] = useState<string>('Customer');
   const { user } = useUserContext();
+  const { data: unreadCount = 0 } = useGetUnreadNotificationCount(user.accountId);
   const { mutate: signOut, isSuccess } = useSignOutAccount();
   useEffect(() => {
     if (isSuccess) {
@@ -55,26 +58,19 @@ export default function Menu() {
         </Button>
       </div>
       <div className='absolute top-7 right-7 flex items-start'>
-        <DropdownMenu modal={false}>
-          <DropdownMenuTrigger className='mr-4' asChild>
-            <Button
-            variant={'secondary'}
-              size="icon"
-            >
-              <Bell className={`h-[1.2rem] w-[1.2rem] `} />
-            </Button>
-          </DropdownMenuTrigger>
-        {/* <NotificationContent   notifications={[
-    {
-      id: '1',
-      avatarUrl: 'https://github.com/shadcn.png',
-      fallback: 'CN',
-      message: 'New message received',
-      time: '2 hours ago',
-    },
-    // Add more notifications here
-  ]}></NotificationContent> */}
-        </DropdownMenu>
+      <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="icon" className="relative mr-2">
+                  <Bell />
+                  {unreadCount > 0 && (
+                    <Badge className="absolute -top-[0.5px] -right-[0.5px] flex items-center justify-center px-1 min-w-[20px] h-5 text-xs leading-none">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <NotificationContent />
+            </DropdownMenu>
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger className={`flex justify-center items-center p-2
     ${theme === 'light' ? 'bg-white' : 'bg-[#1E293B]'}

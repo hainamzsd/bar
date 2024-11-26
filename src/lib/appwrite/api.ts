@@ -2,34 +2,47 @@ import { INewUser, IUser } from "@/types";
 import {ID, Models, OAuthProvider, Query} from 'appwrite'
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
 import { MentionFromAPI } from "@/types/mention";
-
-export async function createUserAccount(user: INewUser){
-    try{
-        const newAccount = await account.create(
-            ID.unique(),
-            user.email,
-            user.password,
-        )
-
-        if(!newAccount) throw Error;
-        const avatarUrl = avatars.getInitials(user.username);
-        const newUser = await saveUserToDB({
-            accountId: newAccount.$id,
-            email: newAccount.email,
-            username: user.username,
-            imageUrl: String(avatarUrl),
-            joinDate:new Date().toISOString(),
-            isActive: true,
-            role: 'customer'
-        })
-        return newUser;
-    }catch(error){
-        console.log(error)
-        console.log("WAHHTH")
-        return error;
+export async function createUserAccount(user: INewUser) {
+  try {
+    // Check if username already exists
+    const existingUsername = await searchUserByUsername(user.username);
+    if (existingUsername.total > 0) {
+      throw new Error("Username already exists");
     }
-}
 
+    // Check if email already exists
+    const existingEmail = await searchUserByEmail(user.email);
+    if (existingEmail.total > 0) {
+      throw new Error("Email already exists");
+    }
+
+    // If no existing username or email, create the account
+    const newAccount = await account.create(
+      ID.unique(),
+      user.email,
+      user.password,
+      user.username
+    );
+
+    if (!newAccount) throw new Error("Failed to create account");
+
+    const avatarUrl = avatars.getInitials(user.username);
+    const newUser = await saveUserToDB({
+      accountId: newAccount.$id,
+      email: newAccount.email,
+      username: user.username,
+      imageUrl: String(avatarUrl),
+      joinDate: new Date().toISOString(),
+      isActive: true,
+      role: 'customer'
+    });
+
+    return newUser;
+  } catch (error) {
+    console.error("Error creating user account:", error);
+    throw error;
+  }
+}
 
 
 
@@ -100,7 +113,7 @@ export async function updateUser(userId: string, userData: Partial<IUser>) {
 
       // Filter out the accountId field and update gender
       const { accountId, ...filteredUserData } = userData;
-
+      console.log('Filtered user data:', JSON.stringify(filteredUserData, null, 2));
       const updatedUser = await databases.updateDocument(
           appwriteConfig.databaseId as any,
           appwriteConfig.userCollectionId as any,
@@ -128,26 +141,34 @@ export async function deleteFile(fileId: string) {
       throw error;
     }
   }
-
-export async function searchUserByUsername(username: string) {
+  export async function searchUserByEmail(email: string) {
     try {
-        const users = await databases.listDocuments(
-            appwriteConfig.databaseId as any,
-            appwriteConfig.userCollectionId as any,
-            [Query.search('username', username)]
-        );
-
-        if (users.total === 0) {
-            throw new Error(`No users found with the username: ${username}`);
-        }
-
-        return users;
+      const users = await databases.listDocuments(
+        appwriteConfig.databaseId as string,
+        appwriteConfig.userCollectionId as string,
+        [Query.equal('email', email)]
+      );
+  
+      return users;
     } catch (error) {
-        console.error("Error searching for users:", error);
-        throw error;
+      console.error("Error searching for users by email:", error);
+      throw error;
     }
-}
-
+  }
+  export async function searchUserByUsername(username: string) {
+    try {
+      const users = await databases.listDocuments(
+        appwriteConfig.databaseId as string,
+        appwriteConfig.userCollectionId as string,
+        [Query.search('username', username)]
+      );
+  
+      return users;
+    } catch (error) {
+      console.error("Error searching for users:", error);
+      throw error;
+    }
+  }
 export async function signInAccount(user: {
     email: string;
     password: string;
@@ -160,6 +181,18 @@ export async function signInAccount(user: {
         // Re-throw the error to pass it up to the caller
         throw error; 
     }
+}
+
+
+
+export async function confirmVerification(userId: string, secret: string) {
+try {
+  const result = await account.updateVerification(userId, secret);
+  return result;
+} catch (error) {
+  console.error("Error confirming verification:", error);
+  throw error;
+}
 }
 export async function signInFacebook() {
     try {
@@ -239,6 +272,16 @@ export async function getMentions(userId: string): Promise<MentionFromAPI[]> {
       throw error;
     }
   }
+
+  export async function checkUserLoggedIn() {
+    try {
+      const user = await account.get();
+      return !!user;
+    } catch (error) {
+      console.error("Error checking user login status:", error);
+      return false;
+    }
+  }
 export async function getCurrentUser(){
     try{
         const currentAccount = await account.get();
@@ -257,14 +300,14 @@ export async function getCurrentUser(){
 }
 
 export async function signOutAccount() {
-    try {
-        const session = await account.deleteSession("current");
-        
-        return session;
-    } catch (error) {
-        console.error("Error during logout:", error);
-        throw error;  // Rethrow the error to handle it upstream if needed
-    }
+  try {
+    await account.deleteSession('current')
+    // You might want to clear any local storage or cookies here
+    localStorage.removeItem('user') // Assuming you store user info in localStorage
+  } catch (error) {
+    console.error("Error during logout:", error)
+    throw error
+  }
 }
 
 export async function updateUserBio(accountId: string, bio: string) {

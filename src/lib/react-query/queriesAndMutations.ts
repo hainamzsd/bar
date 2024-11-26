@@ -7,18 +7,31 @@ import {
 import { createUserAccount, getMentions, getMiniProfile, getUserByAccountId, getUserById, searchUserByUsername, signInAccount, signInFacebook, signOutAccount, updateUser } from '../appwrite/api'
 import { INewUser, IUser } from '@/types'
 import { MentionFromAPI } from '@/types/mention'
+import { useRouter } from 'next/navigation'
 
 export const useCreateUserAccount = () => {
     return useMutation({
         mutationFn: (user: INewUser) => createUserAccount(user)
     })
 }
-
 export const useSignInAccount = () => {
-    return useMutation({
-        mutationFn: (user: {email:string;
-            password:string}) => signInAccount(user)
-    })
+  const queryClient = useQueryClient()
+  const router = useRouter()
+
+  return useMutation({
+      mutationFn: (user: { email: string; password: string }) => signInAccount(user),
+      onSuccess: (user) => {
+          // Update the user in the query cache
+          queryClient.setQueryData(['user'], user)
+
+          // Redirect to the home page or dashboard
+          router.push('/dashboard/explore')
+      },
+      onError: (error: any) => {
+          console.error("Error during sign in:", error)
+          // You might want to set some error state here to display to the user
+      }
+  })
 }
 
 export const useMentionSuggestions = (mentionQuery: string, showSuggestions: boolean) => {
@@ -76,9 +89,22 @@ export const useGetMentions = (userId: string) => {
 
 
 export const useSignOutAccount = () => {
-    return useMutation({
-        mutationFn: signOutAccount
-    })
+  const queryClient = useQueryClient()
+const router = useRouter()
+  return useMutation({
+    mutationFn: signOutAccount,
+    onSuccess: () => {
+      // Clear all queries and mutations from the cache
+      queryClient.clear()
+      // Invalidate all queries to refetch fresh data if needed
+      queryClient.invalidateQueries()
+      // Redirect to login page
+      router.push('/')
+    },
+    onError: (error) => {
+      console.error("Error during sign out:", error)
+    }
+  })
 }
 
 export const useSignInFacebook = () => {

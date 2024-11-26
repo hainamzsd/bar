@@ -21,7 +21,7 @@ import { PuffLoader } from 'react-spinners';
 const SignUpDialog = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const { checkAuthUser } = useUserContext();
+  const { setUser, setIsAuthenticated } = useUserContext();
   const { mutateAsync: createUserAccount, isPending: isCreatingUser } = useCreateUserAccount();
 
   const form = useForm<z.infer<typeof SignUpValidation>>({
@@ -33,7 +33,6 @@ const SignUpDialog = () => {
       repassword: "",
     }
   })
-
   async function onSubmit(values: z.infer<typeof SignUpValidation>) {
     try {
       const newUser = await createUserAccount(values);
@@ -41,26 +40,40 @@ const SignUpDialog = () => {
         throw new Error("Failed to create account");
       }
 
-      // Add a delay before checking auth to allow for database updates
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Set user and authentication state immediately after account creation
+      setUser({
+        accountId: newUser.$id,
+        username: newUser.username,
+        email: newUser.email,
+        imageUrl: newUser.imageUrl || '',
+        bio: newUser.bio || '',
+        joinDate: newUser.$createdAt,
+        isActive: true,
+        role: 'customer'
+      });
+      setIsAuthenticated(true);
 
-      const isLoggedIn = await checkAuthUser();
-      if (isLoggedIn) {
-        form.reset();
-        router.push('/home');
-      } else {
-        throw new Error("Failed to authenticate");
-      }
+      form.reset();
+      router.push('/home');
     } catch (error) {
       console.error('Sign up error:', error);
+      let errorMessage = "Vui lòng thử lại sau.";
+      if (error instanceof Error) {
+        if (error.message === "Username already exists") {
+          errorMessage = "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.";
+        } else if (error.message === "Email already exists") {
+          errorMessage = "Email đã được sử dụng. Vui lòng sử dụng email khác.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
       toast({
         title: "Đăng ký không thành công",
-        description: error instanceof Error ? error.message : "Vui lòng thử lại sau.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
   }
-
   return (
     <div className="sm:max-w-[425px]">
       <Form {...form}>
@@ -153,3 +166,4 @@ const SignUpDialog = () => {
 };
 
 export default SignUpDialog;
+
