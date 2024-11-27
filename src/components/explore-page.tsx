@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { TrendingUp, Users, BookOpen, Tv, Loader2 } from 'lucide-react'
+import { TrendingUp, Users, BookOpen, Tv, Loader2, Facebook } from 'lucide-react'
 import { PostCard } from './post-related/post-card'
 import { useGetAllPosts } from '@/lib/react-query/postQueriesAndMutations'
 import PostSkeleton from './skeleton/post-skeleton'
@@ -115,6 +115,20 @@ const ExplorePage = () => {
 
   return (
     <div className="mx-auto space-y-8 p-4">
+         <div className="w-full from-primary to-primary-foreground p-4 rounded-lg shadow-md mb-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Tham gia nhóm</h2>
+          <a
+            href="https://www.facebook.com/share/g/1GY3r39rDj/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center text-primary px-4 py-2 rounded-full hover:bg-opacity-90 transition-colors duration-200"
+          >
+            <Facebook className="w-5 h-5 mr-2" />
+            <span className="font-medium">Nhóm Facebook</span>
+          </a>
+        </div>
+      </div>
       <RandomAnimeImage />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
